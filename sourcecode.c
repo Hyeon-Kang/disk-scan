@@ -6,11 +6,11 @@ int main(int argc, char ** argv)
 {
     int retCode = 0;
     BYTE sector[512];
-    DWORD bytesRead;
-    HANDLE device = NULL;
+    DWORD bytesRead;  // 파일 포인터의 이동 시작 위치를 지정.
+    HANDLE device = NULL; // 파일포인터를 옮기고자 하는 대상 파일의 핸들. 목표 저장장치 주소를 담을 변수로 사용.
     int numSector = 5;
 
-    device = CreateFile("\\\\.\\E:",    // Drive to open
+    device = CreateFile("\\\\.\\E:",    // HANDLE 변수에 드라이브 구조체 지정 (경로, 접근 모드, )
                         GENERIC_READ,           // 접근 모드 : 읽기
                         FILE_SHARE_READ|FILE_SHARE_WRITE,        // Share Mode
                         NULL,                   // Security Descriptor
