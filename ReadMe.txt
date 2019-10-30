@@ -97,3 +97,25 @@ SetFilePointer(m_hLogFileHandler, dwSavedFilePointer, NULL, FILE_CURRENT);
 ReadFile(m_hLogFileHandler, testbuff, 2, &dwRead, NULL);
 // 위에서 넘겨준 만큼만 읽고..
 dwSavedFilePointer+=2;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+==== 참조 자료 ====
+*) GetLastError() 코드 모음
+http://egloos.zum.com/sakula99/v/2969627
