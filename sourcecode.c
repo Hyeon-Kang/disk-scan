@@ -1,5 +1,5 @@
 #include <windows.h>
-
+#include <winbase.h>
 #include <stdio.h>
 
 int main(int argc, char ** argv)
@@ -10,7 +10,7 @@ int main(int argc, char ** argv)
     HANDLE device = NULL;
     int numSector = 5;
 
-    device = CreateFile(L"\\\\.\\C:",    // Drive to open
+    device = CreateFile("\\\\.\\E:",    // Drive to open
                         GENERIC_READ,           // Access mode
                         FILE_SHARE_READ|FILE_SHARE_WRITE,        // Share Mode
                         NULL,                   // Security Descriptor
@@ -25,7 +25,7 @@ int main(int argc, char ** argv)
     }
 
     SetFilePointer (device, numSector*512, NULL, FILE_BEGIN) ;
-
+    printf(read sector : %s)
     if (!ReadFile(device, sector, 512, &bytesRead, NULL))
     {
         printf("ReadFile: %u\n", GetLastError());
@@ -37,5 +37,3 @@ int main(int argc, char ** argv)
 
     return 0;
 }
-
-출처 : https://stackoverflow.com/questions/29219674/read-specific-sector-on-hard-drive-using-c-language-on-windows
