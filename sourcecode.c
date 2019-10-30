@@ -11,7 +11,7 @@ int main(int argc, char ** argv)
     int numSector = 5;
 
     device = CreateFile("\\\\.\\E:",    // Drive to open
-                        GENERIC_READ,           // Access mode
+                        GENERIC_READ,           // 접근 모드 : 읽기
                         FILE_SHARE_READ|FILE_SHARE_WRITE,        // Share Mode
                         NULL,                   // Security Descriptor
                         OPEN_EXISTING,          // How to create
@@ -25,7 +25,8 @@ int main(int argc, char ** argv)
     }
 
     SetFilePointer (device, numSector*512, NULL, FILE_BEGIN) ;
-    printf(read sector : %s)
+
+    // 주소 읽어오기
     if (!ReadFile(device, sector, 512, &bytesRead, NULL))
     {
         printf("ReadFile: %u\n", GetLastError());
