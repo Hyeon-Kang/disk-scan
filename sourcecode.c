@@ -10,9 +10,9 @@ int main(int argc, char ** argv)
     HANDLE device = NULL; // 파일포인터를 옮기고자 하는 대상 파일의 핸들. 목표 저장장치 주소를 담을 변수로 사용.
     int numSector = 5;
 
-    device = CreateFile("\\\\.\\E:",    // HANDLE 변수에 드라이브 구조체 지정 (경로, 접근 모드, )
+    device = CreateFile("\\\\.\\E:",            // HANDLE 변수에 드라이브 구조체 지정 (경로, 접근 모드, )
                         GENERIC_READ,           // 접근 모드 : 읽기
-                        FILE_SHARE_READ|FILE_SHARE_WRITE,        // Share Mode
+                        FILE_SHARE_READ,        //|FILE_SHARE_WRITE,(쓰기 옵션은 제거)  // Share Mode
                         NULL,                   // Security Descriptor
                         OPEN_EXISTING,          // How to create
                         0,                      // File attributes
@@ -36,6 +36,6 @@ int main(int argc, char ** argv)
     {
         printf("Success!\n");
     }
-
+    
     return 0;
 }
