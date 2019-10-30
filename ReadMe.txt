@@ -154,6 +154,9 @@ https://nextline.tistory.com/92
 *) Read sectors from hard drive (생각보다 좋음)
 http://www.rohitab.com/discuss/topic/17877-read-sectors-from-hard-drive/
 
+*) DeviceIoControl MS document
+https://docs.microsoft.com/en-us/windows/win32/devio/calling-deviceiocontrol?redirectedfrom=MSDN
 
-키워드 정리
+
+==== 키워드 정리 ====
 reading disk sectors in c
