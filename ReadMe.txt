@@ -12,6 +12,12 @@
 3. 읽어온 데이터를 저장
 
 
+What would you like to do?
+1. Read from disk by index of cylinder/track/sector.
+2. Read from disk by index of first byte of file.
+3. Find first-byte index of file.
+4. Quit.
+
 ** 만약 용량 제한이 있을 경우를 대비해 2GB sdcard 구매 경로를 남긴다.
 http://www.g9.co.kr/Display/VIP/Index/1646467091?jaehuid=200006432&NaPm=ct%3Dk2d6knds%7Cci%3D89e46f4ab9e75409ce503c8d1170b5ce04507148%7Ctr%3Dslsl%7Csn%3D280455%7Chk%3De6e79f9ba2df8056520a5c1175dd0801bc6472e3
 
@@ -36,6 +42,21 @@ Unsigned int 형으로 구성된 리소스 주소를 관리한다.
 
 [window 운영체제에서 HANDLE을 통해 주소를 관리하는 방법 참조]
 *) https://m.blog.naver.com/PostView.nhn?blogId=tipsware&logNo=221065382244&proxyReferer=https%3A%2F%2Fwww.google.com%2F
+
+
+[윈도우 환경에서 hard disk sector를 다루는 표준안 MS document 참조]
+https://social.msdn.microsoft.com/Forums/en-US/d425884e-1548-450d-ac33-24d1f42b50e9/c-code-to-read-the-sectors-on-hard-disk?forum=csharpgeneral
+The standard way to read sectors of a hard disk is :
+
+CreateFile
+DeviceIoControl with IOCTL_DISK_GET_DRIVE_GEOMETRY
+VirtualAlloc
+SetFilePointer
+ReadFile
+VirtualFree
+CloseHandle
+
+
 
 
 - 참조 내용
@@ -111,11 +132,28 @@ dwSavedFilePointer+=2;
 
 
 
+==== 응용편 ====
 
+파일종류의 판별을 위한 시그니처 분석
+http://forensic-proof.com/archives/300
 
 
 
 
 ==== 참조 자료 ====
+
 *) GetLastError() 코드 모음
 http://egloos.zum.com/sakula99/v/2969627
+
+*) C++ 을 사용한 disk sector 접근 참고 자료
+http://www.cplusplus.com/forum/windows/18019/
+
+*) C 포렌식 툴 프로젝트
+https://nextline.tistory.com/92
+
+*) Read sectors from hard drive (생각보다 좋음)
+http://www.rohitab.com/discuss/topic/17877-read-sectors-from-hard-drive/
+
+
+키워드 정리
+reading disk sectors in c
