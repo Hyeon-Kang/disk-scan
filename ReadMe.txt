@@ -12,6 +12,8 @@
 3. 읽어온 데이터를 저장
 
 
+** 만약 용량 제한이 있을 경우를 대비해 2GB sdcard 구매 경로를 남긴다.
+http://www.g9.co.kr/Display/VIP/Index/1646467091?jaehuid=200006432&NaPm=ct%3Dk2d6knds%7Cci%3D89e46f4ab9e75409ce503c8d1170b5ce04507148%7Ctr%3Dslsl%7Csn%3D280455%7Chk%3De6e79f9ba2df8056520a5c1175dd0801bc6472e3
 
 
 ===== 응용 목표 ====
