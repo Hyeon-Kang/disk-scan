@@ -25,6 +25,7 @@ int main(int argc, char ** argv)
     }
 
     SetFilePointer (device, numSector*512, NULL, FILE_BEGIN) ;
+    // 저장장치 용량이 4GB 이하인 경우 3번째 인자는 NULL 값을 주고 2번째 인자로만 파일 위치를 지정한다.
 
     // 주소 읽어오기
     if (!ReadFile(device, sector, 512, &bytesRead, NULL))
