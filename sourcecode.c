@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 int main(int argc, char ** argv)
-{
+  {
     int retCode = 0;
     BYTE sector[512];
     DWORD bytesRead;  // 파일 포인터의 이동 시작 위치를 지정.
@@ -36,6 +36,6 @@ int main(int argc, char ** argv)
     {
         printf("Success!\n");
     }
-    
+
     return 0;
 }
