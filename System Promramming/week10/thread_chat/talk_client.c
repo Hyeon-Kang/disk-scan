@@ -10,6 +10,7 @@
 
 int readline(int, char *, int );	/* 키보드에서 한 줄씩 읽는 함수 */
 char *escapechar = "exit\n";	/* 종료문자 정의 */
+
 int main(int argc, char *argv[]) {
 char line[MAXLINE], sendline[MAXLINE], recvline[MAXLINE+1];
 char *haddr;
@@ -68,4 +69,4 @@ printf("%s", recvline);
 }
 }
 }
-close(s); 
+close(s);
