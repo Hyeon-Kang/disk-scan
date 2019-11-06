@@ -19,6 +19,8 @@ int main (void) {
       struct sockaddr_in sin, cli;
       int sd, ns, clientlen = sizeof(cli);
       char sendline[MAXLINE], rbuf[MAXLINE];
+      pid_t pid;
+      int size;
 
       // 소켓 주소 구조체 초기화 및 값 설정
       memset( (char *) &sin, '\0', sizeof(sin));
@@ -38,7 +40,7 @@ int main (void) {
             printf("Server : bind error");
             exit(1);
       }
-      printf("wating for connection...")
+      printf("wating for connection...\n");
       // 클라이언트 접속을 기다림
       // (클라이언트 요청 받을 준비가 되었음을 운영체제에 알림)
       if (listen(sd, 5) == -1) { // 접속 대기자 큐 공간 사이즈는 5
@@ -75,6 +77,7 @@ int main (void) {
           }
           /* 종료 문자열 입력 확인 */
           if(strncmp(sendline, escapechar, 4) == 0) {
+            printf("close chat_server.\n");
             kill(pid, SIGQUIT);
             break;
           }
@@ -87,6 +90,7 @@ int main (void) {
             rbuf[size] = '\0';
             /* 종료문자열 수신 처리 */
             if (strncmp(rbuf, escapechar, 4) == 0) break;
+            printf("YOU: ");
             printf("%s", rbuf);
           }
         }
@@ -110,5 +114,6 @@ int readline(int fd, char *ptr, int maxlen) {
     }
   }
   *ptr = 0;
+  //printf("ME: ");
   return (n);
 }

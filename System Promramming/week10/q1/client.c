@@ -20,6 +20,8 @@ int main(void) {
       char buf[256];
       struct sockaddr_in sin;
       char line[MAXLINE], sendline[MAXLINE], recvline[MAXLINE+1];
+      pid_t pid;
+      int size;
 
       // 소켓 주소구조체 초기화 및 서버 정보 입력
       memset((char*) &sin, '\0', sizeof(sin));
@@ -35,7 +37,7 @@ int main(void) {
 
       // 서버에 연결 요청
       if (connect(sd, (struct sockaddr *)&sin, sizeof(sin))) {
-            perror("connect");
+            printf("Client : connect error");
             exit(1);
       }
 
@@ -48,37 +50,33 @@ int main(void) {
       // 서버로부터 받은 메시지 출력
       printf("** From Server : %s\n", buf);
 
-      while(1) {
-            // 서버로부터 메시지 수신
-            if(recv(sd, buf, sizeof(buf), 0) == -1) {
-                  perror("recv");
-                  exit(1);
-            }
-
-            // 서버로부터 받은 메시지 출력
-            printf("** From Server : %s\n", buf);
-
-            // 종료 검사
-            if (strncmp(buf,"/quit",5) == 0 ){
-                  break;
-            }
-
-            // 서버로 메시지 전송
-            printf("to server : ");
-            gets(buf);
-            if(send(sd, buf, sizeof(buf) + 1, 0) == -1) {
-                  perror("send");
-                  exit(1);
-            }
-
-            // 종료 검사
-            if (strncmp(buf,"/quit",5) == 0 ){
-                  break;
-            }
-
-
-
-
+      // 스레드 수정
+      if(( pid = fork()) > 0) {
+        /* 부모 프로세스는 키보드 입력을 서버로 전송 */
+        while(readline(0, sendline,MAXLINE) != 0) {
+          size = strlen(sendline);
+          if(write(sd, sendline, strlen(sendline)) != size) {
+            printf("Client: can't write to server.\n");
+            return -1;
+          }
+          /* 종료문자열 입력 처리 */
+          if(strncmp(sendline, escapechar, 4) == 0) {
+            printf("close chat_server.\n");
+            kill(pid, SIGQUIT);
+            break;
+          }
+        }
+      } else if (pid == 0) {
+        /* 자식 프로세스는 소켓으로부터 들어오는 메시지를 화면에 출력 */
+        while(1) {
+          if((size = read(sd, recvline, MAXLINE)) > 0) {
+            recvline[size] = '\0';
+            /* 종료문자열 수신시 종료 */
+            if(strncmp(recvline, escapechar,4) == 0) break;
+            printf("YOU: ");
+            printf("%s", recvline);
+          }
+        }
       }
 
       close(sd); // 소켓 기술자 닫기
