@@ -6,13 +6,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <signal.h>
 
 #define PORTNUM 9001 // 통신에 사용할 포트 번호 선언
+
+int readline(int, char *, int);
+char *escapechar = "exit\n";	/* 종료문자 */
 
 int main (void) {
       char buf[256];
       struct sockaddr_in sin, cli;
       int sd, ns, clientlen = sizeof(cli);
+      char sendline[256], rbuf[256];
 
       // 소켓 주소 구조체 초기화 및 값 설정
       memset( (char *) &sin, '\0', sizeof(sin));
@@ -42,7 +47,7 @@ int main (void) {
 
       // 클라이언트 접속 허가
       if ((ns = accept(sd, (struct sockaddr *)&cli, &clientlen)) == -1) {
-            perror("accept"); 
+            perror("accept");
             exit(1);
       } // 새로운 소켓 기술자 리턴
 
@@ -58,36 +63,51 @@ int main (void) {
             exit(1);
       }
 
+      // 수정
 
-      while (1) { // 서버는 무한 반복으로 서비스 제공
+      /* 부모 프로세스는 키보드 입력을 클라이언트에게 전송 */
+      if((pid = fork()) > 0) {
+        while(readline(0, sendline, 256) != 0) {
+          size = strlen(sendline);
+          if(write(ns, sendline, strlen(sendline)) != size) {
+            printf("Server: fail in writing\n");
+          }
+          /* 종료 문자열 입력 확인 */
+          if(strncmp(sendline, escapechar, 4) == 0) {
+            kill(pid, SIGQUIT);
+            break;
+          }
+        }
 
-
-
-            // 클라이언트로부터 메시지 수신
-            if(recv(ns, buf, strlen(buf), 0) == -1) {
-                  perror("recv");
-                  exit(1);
-            }
-            // 클라로부터 받은 메시지 출력
-            printf("** From Client : %s \n", buf);
-
-            if (strncmp(buf,"/quit",5) == 0 ){
-                  printf("통신 종료\n");
-                  break;
-            }
-
-            // 클라이언트로 메시지 전송
-            printf("to Client : ");
-            gets(buf);
-            if(send(ns, buf, sizeof(buf) + 1, 0) == -1) {
-                  perror("send");
-                  exit(1);
-            }
-
-            printf("\n");
+        /* 자식프로세스는 소켓으로부터 들어오는 메시지를 화면에 출력 */
+      } else if (pid == 0) {
+        while(1) {
+          if((size = read(ns, rbuf, 256)) > 0) {
+            rbuf[size] = '\0';
+            /* 종료문자열 수신 처리 */
+            if (strncmp(rbuf, escapechar, 4) == 0) break;
+            printf("%s", rbuf);
+          }
+        }
       }
       close(ns); // 서비스가 끝났으므로 소켓 닫기
       close(sd); // 접속 받는 용도로 사용한 소켓 닫기 (서버측)
 
       return 0;
+}
+
+int readline(int fd, char *ptr, int maxlen) {
+  int n, rc;
+  char c;
+  for(n = 1; n < maxlen; n++) {
+    if((rc = read(fd, &c, 1)) == 1) {
+      *ptr++ = c;
+      if (c == '\n') break;
+    } else if (rc == 0) {
+      if(n == 1) return (0);
+      else break;
+    }
+  }
+  *ptr = 0;
+  return (n);
 }
