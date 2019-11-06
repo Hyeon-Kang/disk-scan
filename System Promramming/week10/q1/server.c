@@ -9,6 +9,7 @@
 #include <signal.h>
 
 #define PORTNUM 9001 // 통신에 사용할 포트 번호 선언
+#define MAXLINE 256
 
 int readline(int, char *, int);
 char *escapechar = "exit\n";	/* 종료문자 */
@@ -17,7 +18,7 @@ int main (void) {
       char buf[256];
       struct sockaddr_in sin, cli;
       int sd, ns, clientlen = sizeof(cli);
-      char sendline[256], rbuf[256];
+      char sendline[MAXLINE], rbuf[MAXLINE];
 
       // 소켓 주소 구조체 초기화 및 값 설정
       memset( (char *) &sin, '\0', sizeof(sin));
@@ -67,7 +68,7 @@ int main (void) {
 
       /* 부모 프로세스는 키보드 입력을 클라이언트에게 전송 */
       if((pid = fork()) > 0) {
-        while(readline(0, sendline, 256) != 0) {
+        while(readline(0, sendline, MAXLINE) != 0) {
           size = strlen(sendline);
           if(write(ns, sendline, strlen(sendline)) != size) {
             printf("Server: fail in writing\n");
@@ -82,7 +83,7 @@ int main (void) {
         /* 자식프로세스는 소켓으로부터 들어오는 메시지를 화면에 출력 */
       } else if (pid == 0) {
         while(1) {
-          if((size = read(ns, rbuf, 256)) > 0) {
+          if((size = read(ns, rbuf, MAXLINE)) > 0) {
             rbuf[size] = '\0';
             /* 종료문자열 수신 처리 */
             if (strncmp(rbuf, escapechar, 4) == 0) break;
