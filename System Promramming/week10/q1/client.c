@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <signal.h>
 
 #define PORTNUM 9001 // 서버측 포트 번호
 
