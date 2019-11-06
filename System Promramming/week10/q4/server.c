@@ -12,7 +12,7 @@
 #include <time.h>
 #include <sys/utsname.h>
 
-#define PORTNUM 9001 // 통신에 사용할 포트 번호 선언
+#define PORTNUM 9002 // 통신에 사용할 포트 번호 선언
 #define MAXLINE 256
 
 int readline(int, char *, int);
@@ -123,18 +123,18 @@ int main (void) {
                   kill(pid, SIGQUIT);
                   break;
                 }
-                
+
                 rbuf[size] = '\0';
               }
 
             }
             // 시스템 정보 요구
 
-            if (strcmp(rbuf, "<SINFO>") == 0){
-              rbuf[size] = '\0';
+            if (strcmp(rbuf, "<SINFO>\n") == 0){
+              //rbuf[size] = '\0';
               //strcpy(rbuf, " ");
-              strcpy(rbuf, uts.machine);
-              if(write(ns, rbuf, strlen(rbuf)) != size) {
+              strcpy(buf, uts.machine);
+              if(write(ns, buf, strlen(buf)) != size) {
                 printf("Server: fail in writing\n");
               }
               //strcpy(sendline, " ");
@@ -142,11 +142,11 @@ int main (void) {
             }
 
             // 시스템 시간 요구
-            if (strcmp(rbuf, "<STIME>") == 0){
-              rbuf[size] = '\0';
+            if (strcmp(rbuf, "<STIME>\n") == 0){
+              //rbuf[size] = '\0';
               //strcpy(rbuf, "");
-              strcpy(rbuf, asctime(tm));
-              if(write(ns, rbuf, strlen(rbuf)) != size) {
+              strcpy(buf, asctime(tm));
+              if(write(ns, buf, strlen(buf)) != size) {
                 printf("Server: fail in writing\n");
               }
               //strcpy(sendline, "");

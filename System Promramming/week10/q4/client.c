@@ -9,7 +9,7 @@
 #include <string.h>
 #include <signal.h>
 
-#define PORTNUM 9001 // 서버측 포트 번호
+#define PORTNUM 9002 // 서버측 포트 번호
 #define MAXLINE 256
 
 int readline(int, char *, int); // 한줄씩 읽기 함수
