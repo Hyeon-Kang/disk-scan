@@ -123,7 +123,7 @@ int main (void) {
                   kill(pid, SIGQUIT);
                   break;
                 }
-
+                
                 rbuf[size] = '\0';
               }
 
