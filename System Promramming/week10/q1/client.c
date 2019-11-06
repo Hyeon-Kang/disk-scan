@@ -10,6 +10,7 @@
 #include <signal.h>
 
 #define PORTNUM 9001 // 서버측 포트 번호
+#define MAXLINE 256
 
 int readline(int, char *, int); // 한줄씩 읽기 함수
 char *escapechar = "exit\n";	/* 종료문자 */
@@ -18,6 +19,7 @@ int main(void) {
       int sd;
       char buf[256];
       struct sockaddr_in sin;
+      char line[MAXLINE], sendline[MAXLINE], recvline[MAXLINE+1];
 
       // 소켓 주소구조체 초기화 및 서버 정보 입력
       memset((char*) &sin, '\0', sizeof(sin));
