@@ -1,7 +1,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <netdb.h>
+//#include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
@@ -10,6 +10,9 @@
 #include <signal.h>
 
 #define PORTNUM 9001 // 서버측 포트 번호
+
+int readline(int, char *, int); // 한줄씩 읽기 함수
+char *escapechar = "exit\n";	/* 종료문자 */
 
 int main(void) {
       int sd;
@@ -78,4 +81,20 @@ int main(void) {
 
       close(sd); // 소켓 기술자 닫기
       return 0;
+}
+
+int readline(int fd, char *ptr, int maxlen) {
+  int n, rc;
+  char c;
+  for(n = 1; n < maxlen; n++) {
+    if((rc = read(fd, &c, 1)) == 1) {
+      *ptr++ = c;
+      if (c == '\n') break;
+    } else if (rc == 0) {
+      if(n == 1) return (0);
+      else break;
+    }
+  }
+  *ptr = 0;
+  return (n);
 }
