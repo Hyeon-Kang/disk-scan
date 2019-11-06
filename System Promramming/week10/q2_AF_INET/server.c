@@ -58,7 +58,7 @@ int main (void) {
       sprintf(buf, "%s", inet_ntoa(cli.sin_addr));
       printf("** 새로운 호스트 접속 : %s\n", buf);
 
-      strcpy(buf, "Welcome to Network Server!");
+      strcpy(buf, "Welcome to Network Server!\n<Available Services>\n1. Echo server <ECHO>\n2. Get server info <SINFO>\n3. Get server time <STIME>\n");
 
       // 클라이언트에게 환영 메시지 전송
       if(send(ns, buf, strlen(buf) +1, 0) == -1) {
