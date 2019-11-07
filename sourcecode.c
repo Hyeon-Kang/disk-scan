@@ -49,3 +49,5 @@ int main(int argc, char ** argv)
 }
 
 // 지정 경로에 읽어온 데이터를 쓰는 과정 추가, 인식 드라이브 문자 입력
+// write file 참조 링크
+https://hh-nn.tistory.com/43
