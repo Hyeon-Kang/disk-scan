@@ -9,19 +9,25 @@
 #include <string.h>
 #include <signal.h>
 
+//#define SOCKET_NAME     "hsocket"
 #define PORTNUM 9001 // 서버측 포트 번호
 #define MAXLINE 256
 
 int readline(int, char *, int); // 한줄씩 읽기 함수
 char *escapechar = "exit\n";	/* 종료문자 */
 
-int main(void) {
+int main(int argc, char *argv[]) {
       int sd;
       char buf[256];
       struct sockaddr_in sin;
       char line[MAXLINE], sendline[MAXLINE], recvline[MAXLINE+1];
       pid_t pid;
       int size;
+
+      struct Name {
+        char n[20]; // 이름 저장
+        int len;
+      } name;
 
       // 소켓 주소구조체 초기화 및 서버 정보 입력
       memset((char*) &sin, '\0', sizeof(sin));
@@ -34,6 +40,10 @@ int main(void) {
             perror("socket");
             exit(1);
       }
+
+      // 사용자 이름 가져오기
+      sprintf(name.n, "[%s]",argv[1]);
+      name.len = strlen(name.n);
 
       // 서버에 연결 요청
       if (connect(sd, (struct sockaddr *)&sin, sizeof(sin))) {
@@ -55,6 +65,14 @@ int main(void) {
         /* 부모 프로세스는 키보드 입력을 서버로 전송 */
         while(readline(0, sendline,MAXLINE) != 0) {
           size = strlen(sendline);
+
+          // 이름 추가
+          sprintf(line, "%s %s", name.n, sendline);
+          if(send(sd, line, size + name.len, 0) != (size+name.len)){
+            printf("Error");
+          }
+          // d이름추가 끝
+
           if(write(sd, sendline, strlen(sendline)) != size) {
             printf("Client: can't write to server.\n");
             return -1;
@@ -73,7 +91,7 @@ int main(void) {
             recvline[size] = '\0';
             /* 종료문자열 수신시 종료 */
             if(strncmp(recvline, escapechar,4) == 0) break;
-            printf("YOU: ");
+            //printf("YOU: ");
             printf("%s", recvline);
           }
         }

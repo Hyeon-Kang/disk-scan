@@ -8,26 +8,19 @@
 #include <string.h>
 #include <signal.h>
 
-//#define SOCKET_NAME     "hsocket"
 #define PORTNUM 9001 // 통신에 사용할 포트 번호 선언
 #define MAXLINE 256
 
 int readline(int, char *, int);
 char *escapechar = "exit\n";	/* 종료문자 */
 
-int main (int argc, char* argv[]) {
+int main (void) {
       char buf[256];
       struct sockaddr_in sin, cli;
       int sd, ns, clientlen = sizeof(cli);
       char sendline[MAXLINE], rbuf[MAXLINE];
-      char line[MAXLINE], recvline[MAXLINE+1];
       pid_t pid;
       int size;
-
-      struct Name {
-          char n[20]; // 이름 저장
-          int len;
-      } name;
 
       // 소켓 주소 구조체 초기화 및 값 설정
       memset( (char *) &sin, '\0', sizeof(sin));
@@ -35,10 +28,6 @@ int main (int argc, char* argv[]) {
       sin.sin_port = htons(PORTNUM); // 서버 접근 포트
       sin.sin_addr.s_addr = inet_addr("168.188.54.212"); // 서버 IP 주소
       // loop back ip로 할까?
-
-      // 사용자 이름 가져오기
-      sprintf(name.n, "[%s]",argv[1]);
-      name.len = strlen(name.n);
 
       // 소켓 생성(아직 데이터 안 들어감)
       if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
@@ -66,10 +55,10 @@ int main (int argc, char* argv[]) {
       } // 새로운 소켓 기술자 리턴
 
       // 클라이언트 주소 출력 (상대방 주소 출력)
-      //sprintf(buf, "%s", inet_ntoa(cli.sin_addr));
-      printf("** 새로운 호스트 접속.\n");
+      sprintf(buf, "%s", inet_ntoa(cli.sin_addr));
+      printf("** 새로운 호스트 접속 : %s\n", buf);
 
-      strcpy(buf, "Welcome to Network Server!\n");
+      strcpy(buf, "Welcome to Network Server!\n<Available Services>\n1. Echo server <ECHO>\n2. Get server info <SINFO>\n3. Get server time <STIME>\n");
 
       // 클라이언트에게 환영 메시지 전송
       if(send(ns, buf, strlen(buf) +1, 0) == -1) {
@@ -83,12 +72,6 @@ int main (int argc, char* argv[]) {
       if((pid = fork()) > 0) {
         while(readline(0, sendline, MAXLINE) != 0) {
           size = strlen(sendline);
-          // 이름 추가
-          sprintf(line, "%s %s", name.n, sendline);
-          if(send(ns, line, size + name.len, 0) != (size+name.len)){
-            printf("Error");
-          }
-          // d이름추가 끝
           if(write(ns, sendline, strlen(sendline)) != size) {
             printf("Server: fail in writing\n");
           }
@@ -107,7 +90,7 @@ int main (int argc, char* argv[]) {
             rbuf[size] = '\0';
             /* 종료문자열 수신 처리 */
             if (strncmp(rbuf, escapechar, 4) == 0) break;
-            //printf("YOU: ");
+            printf("YOU: ");
             printf("%s", rbuf);
           }
         }
