@@ -2,7 +2,7 @@
 #include <winbase.h>
 #include <stdio.h>
 
-// 실행 형식 : ./disk_scan (읽어올 디스크 용량) (긁어온 데이터 저장 경로)
+// 실행 형식 : ./disk_scan (인식 드라이브 경로문자) (읽어올 디스크 용량) (긁어온 데이터 저장 경로)
 int main(int argc, char ** argv)
   {
     int retCode = 0;
@@ -48,4 +48,4 @@ int main(int argc, char ** argv)
     return 0;
 }
 
-// 지정 경로에 읽어온 데이터를 쓰는 과정 추가
+// 지정 경로에 읽어온 데이터를 쓰는 과정 추가, 인식 드라이브 문자 입력
