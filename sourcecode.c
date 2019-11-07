@@ -47,3 +47,5 @@ int main(int argc, char ** argv)
     // 파일 저장
     return 0;
 }
+
+// 지정 경로에 읽어온 데이터를 쓰는 과정 추가
