@@ -22,11 +22,17 @@ int main(int argc, char ** argv)
                         0,                      // File attributes
                         NULL);                  // Handle to template
 
-
-    if(device == INVALID_HANDLE_VALUE) //
+    // 32bit 모드
+    if(device == INVALID_HANDLE_VALUE)
     {
         printf("CreateFile: %u\n", GetLastError());
         return 1;
+    }
+
+    // 64bit 이상 0xFFFFFFFF 분석
+    if( (device == INVALID_SET_FILE_POINTER) && (GetLastError() != NO_ERROR) ){
+      printf("CreateFile: %u\n", GetLastError());
+      return 1;
     }
 
     // 저장장치 용량이 4g보다 크다면 ST64 아니면 ST32
@@ -48,6 +54,8 @@ int main(int argc, char ** argv)
         사용자는 이를 확인해보기 위해서 반드시 GetLastError를 호출해야 한다.
         만일 함수가 성공했고 제대로된 오프셋이라면 LastError가 ERROR_SUCCESS로 셋팅되어 있을 것이다.*/
     }
+
+
     else
     {
         // 16 진수로 바이트 단위로 읽어오기, 점검을 위해 10^9승이 아닌 10^3승까지만 불러옴
