@@ -77,7 +77,9 @@ SetFilePointer() 함수
 항상 lpDistanceToMoveHigh 에 NULL을 넣고 있는 경우이다.
 4기가보다 큰 파일에 대해서 제대로 지원하지 못하는 경우인데 오래 전에 작성된 코드에서 흔히 볼 수 있다.
 
+4기가가 넘으면 0xFFFFFFFF 값까지 쓸수 있으니 아래와 같은 코드로해야한다
 
+if( (반환값 == INVALID_SET_FILE_POINTER) && (GetLastError() != NO_ERROR) )
 
 #. 원형
 DWORD SetFilePointer(
