@@ -15,15 +15,27 @@
 #include <pthread.h>
 #include <unistd.h>
 
-void *start_thread(StudentInfor *stud) {
+struct StudentInfor {
+  char name[20];
+  char major[30];
+  char univ[30];
+};
+
+void *start_thread(StudentInfor stud) {
   //int i;
   for(int i =0; i<10; i++) {
-
+    sleep(1);
+    printf("name : %s\n", (const char*)stud.name);
+    printf("major : %s\n", (const char*)stud.major);
+    printf("univ : %s\n", (const char*)stud.univ);
+    //sleep(1);
   }
+  return stud;
 }
 
 int main(int argc, char* argv[]) {
 
+/*
   struct StudentInfor {
     char name[] = "Kang Daniel";
     char major[] = "Computer Engineering";
@@ -35,4 +47,24 @@ int main(int argc, char* argv[]) {
     char major[] = "Computer Science";
     char univ[] = "TWICE Universiry";
   } stu2;
+*/
+  struct StudentInfor stu1;
+  struct StudentInfor stu2;
+
+  strcpy(stu1.name, "Kang Daniel");
+  strcpy(stu1.major, "Computer Engineering");
+  strcpy(stu1.univ, "101 Universiry");
+
+  strcpy(stu2.name, "Kim Da-hyun");
+  strcpy(stu2.major, "Computer Science");
+  strcpy(stu2.univ, "TWICE Universiry");
+  pthread_t thing1, thing2;
+
+  pthread_create(&thing1, NULL, start_thread, (StudentInfor) stu1);
+  pthread_create(&thing2, NULL, start_thread, (StudentInfor) stu2);
+
+  pthread_join(stu1, NULL);
+  pthread_join(stu2, NULL);
+
+  return 0;
 }
