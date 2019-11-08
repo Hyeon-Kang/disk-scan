@@ -38,6 +38,15 @@ int main(int argc, char ** argv)
     if (!ReadFile(device, sector, 512, &bytesRead, NULL)) //(장치 핸들러, 읽어올 버퍼, sizeof(버퍼), 읽어온 바이트 수를 반환하기 위한 출력용 인수, 4gb 이하면 null)
     {
         printf("ReadFile: %u\n", GetLastError());
+        /*SetFilePointer의 리턴값은 변경된 오프셋 값이며 함수가 실패할 경우에는
+        INVALID_SET_FILE_POINTER 를 돌려주게 된다. INVALID_SET_FILE_POINTER의 값은 -1로 정의되어 있고,
+        이 값은 DWORD로 받아지기 때문에 0xFFFFFFFF가 된다.
+        그런데 만약 내가 변경하고 싶었던 위치가 0xFFFFFFFF(4기가) 였다면?
+        사용자는 0xFFFFFFFF위치로 오프셋을 옮겨줄 것을 요청했고
+        함수는 사용자가 원한 동작을 제대로 수행한 뒤 0xFFFFFFFF를 리턴했다.
+        이제 이 값이 에러인지 정상적인 오프셋 값인지 어떻게 구분해야할까?
+        사용자는 이를 확인해보기 위해서 반드시 GetLastError를 호출해야 한다.
+        만일 함수가 성공했고 제대로된 오프셋이라면 LastError가 ERROR_SUCCESS로 셋팅되어 있을 것이다.*/
     }
     else
     {
