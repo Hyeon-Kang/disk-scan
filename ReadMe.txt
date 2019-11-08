@@ -66,6 +66,19 @@ SetFilePointer() 함수
  win 32bit에서 파일의 최대 크기는 64bit이기 때문에 파일포인터도 64bit의 범위 내에서 이동할 수 있습니다.
  파일 크기가 4GB이하일 경우 세번째 인수는 null값을 주고 두번째 인수만으로 파일 위치를 지정합니다.
 
+ DWORD WINAPI SetFilePointer(
+  __in         HANDLE hFile, // 앞서 세팅한 Handle device 설정값을 매개로 준다. (접근 권한 설정 GENERIC_READ or GENERIC_WRITE)
+  __in         LONG lDistanceToMove, // 바이트 단위로 파일 포인터 이동 (양수는 앞으로, 음수는 뒤로)
+  __inout_opt  PLONG lpDistanceToMoveHigh, //
+  __in         DWORD dwMoveMethod // 파일 포인터 시작 위치 (시작 / 0 / FILE_BEGIN, 현재 위치 / 1 / FILE_CURRENT, 끝 / 2 / FILE_END)
+);
+
+첫번째로 많이 하는 실수는 오프셋이 32비트 크기를 넘어갈 수 있는 경우에도
+항상 lpDistanceToMoveHigh 에 NULL을 넣고 있는 경우이다.
+4기가보다 큰 파일에 대해서 제대로 지원하지 못하는 경우인데 오래 전에 작성된 코드에서 흔히 볼 수 있다.
+
+
+
 #. 원형
 DWORD SetFilePointer(
   HANDLE hFile,
