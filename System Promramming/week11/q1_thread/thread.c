@@ -9,11 +9,11 @@
     for-loop은 0부터 9까지 총 10번을 반복한다.
 */
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <string.h>
 
 struct StudentInfor {
   char name[20];
@@ -21,16 +21,23 @@ struct StudentInfor {
   char univ[30];
 };
 
-void *start_thread(StudentInfor stud) {
-  //int i;
-  for(int i =0; i<10; i++) {
-    sleep(1);
+void print_StudentInfor (struct StudentInfor stud) {
     printf("name : %s\n", (const char*)stud.name);
     printf("major : %s\n", (const char*)stud.major);
     printf("univ : %s\n", (const char*)stud.univ);
+}
+
+void *start_thread(struct StudentInfor stud) {
+  //int i;
+  for(int i =0; i<10; i++) {
+    sleep(1);
+    print_StudentInfor(struct StudentInfor stud);
+    //printf("name : %s\n", (const char*)stud.name);
+    //printf("major : %s\n", (const char*)stud.major);
+    //printf("univ : %s\n", (const char*)stud.univ);
     //sleep(1);
   }
-  return stud;
+  //return stud;
 }
 
 int main(int argc, char* argv[]) {
@@ -60,11 +67,11 @@ int main(int argc, char* argv[]) {
   strcpy(stu2.univ, "TWICE Universiry");
   pthread_t thing1, thing2;
 
-  pthread_create(&thing1, NULL, start_thread, (StudentInfor) stu1);
-  pthread_create(&thing2, NULL, start_thread, (StudentInfor) stu2);
+  pthread_create(&thing1, NULL, start_thread, (struct StudentInfor) stu1);
+  pthread_create(&thing2, NULL, start_thread, (struct StudentInfor) stu2);
 
-  pthread_join(stu1, NULL);
-  pthread_join(stu2, NULL);
+  pthread_join(struct StudentInfor stu1, NULL);
+  pthread_join(struct StudentInfor stu2, NULL);
 
   return 0;
 }
