@@ -29,6 +29,8 @@ int main(int argc, char ** argv)
         return 1;
     }
 
+    // 저장장치 용량이 4g보다 크다면 ST64 아니면 ST32
+
     SetFilePointer (device, numSector*512, NULL, FILE_BEGIN) ;
     // 저장장치 용량이 4GB 이하인 경우 3번째 인자는 NULL 값을 주고 2번째 인자로만 파일 위치를 지정한다.
 
