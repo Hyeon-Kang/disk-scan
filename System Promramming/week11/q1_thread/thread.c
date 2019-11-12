@@ -8,70 +8,56 @@
     ‘start_thread’ 함수는 for-loop에서 name, major, univ 정보를 출력하며,
     for-loop은 0부터 9까지 총 10번을 반복한다.
 */
-
+// pthread에 구조체 인자 전달
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
 #include <string.h>
 
-struct StudentInfor {
+void *print_structure(void *);
+
+typedef struct{
   char name[20];
   char major[30];
   char univ[30];
-};
+} thread_args;
 
-void print_StudentInfor (struct StudentInfor stud) {
-    printf("name : %s\n", (const char*)stud.name);
-    printf("major : %s\n", (const char*)stud.major);
-    printf("univ : %s\n", (const char*)stud.univ);
-}
+int main(void) {
+  pthread_t t1, t2;
 
-void *start_thread(struct StudentInfor stud) {
-  //int i;
-  for(int i =0; i<10; i++) {
-    sleep(1);
-    print_StudentInfor(struct StudentInfor stud);
-    //printf("name : %s\n", (const char*)stud.name);
-    //printf("major : %s\n", (const char*)stud.major);
-    //printf("univ : %s\n", (const char*)stud.univ);
-    //sleep(1);
-  }
-  //return stud;
-}
-
-int main(int argc, char* argv[]) {
-
-/*
-  struct StudentInfor {
-    char name[] = "Kang Daniel";
-    char major[] = "Computer Engineering";
-    char univ[] = "101 Universiry";
-  } stu1;
-
-  struct StudentInfor {
-    char name[] = "Kim Da-hyun";
-    char major[] = "Computer Science";
-    char univ[] = "TWICE Universiry";
-  } stu2;
-*/
-  struct StudentInfor stu1;
-  struct StudentInfor stu2;
-
+  // stu1 구조체 선언
+  thread_args stu1;
   strcpy(stu1.name, "Kang Daniel");
   strcpy(stu1.major, "Computer Engineering");
   strcpy(stu1.univ, "101 Universiry");
 
+  // stu2 구조체 선언
+  thread_args stu2;
   strcpy(stu2.name, "Kim Da-hyun");
   strcpy(stu2.major, "Computer Science");
   strcpy(stu2.univ, "TWICE Universiry");
-  pthread_t thing1, thing2;
 
-  pthread_create(&thing1, NULL, start_thread, (struct StudentInfor) stu1);
-  pthread_create(&thing2, NULL, start_thread, (struct StudentInfor) stu2);
+  // Pthread 실행
+  pthread_create(&t1, NULL, print_structure, &stu1);
+  pthread_create(&t2, NULL, print_structure, &stu2);
 
-  pthread_join(struct StudentInfor stu1, NULL);
-  pthread_join(struct StudentInfor stu2, NULL);
+  // Pthread join(wait)
+  pthread_join(t1, NULL);
+  pthread_join(t2, NULL);
 
   return 0;
+}
+
+// thread 실행 함수
+void *print_structure(void *arg) {
+  // void 형태로 전달한 인자를 구조체로 재정의
+  thread_args *args = (thread_args *) arg;
+
+  printf("%s\n", args->name);
+  printf("%s\n", args->major);
+  printf("%s\n", args->univ);
+  printf("\n");
+
+  return NULL;
 }
