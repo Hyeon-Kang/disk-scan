@@ -69,7 +69,7 @@ SetFilePointer() 함수
  DWORD WINAPI SetFilePointer(
   __in         HANDLE hFile, // 앞서 세팅한 Handle device 설정값을 매개로 준다. (접근 권한 설정 GENERIC_READ or GENERIC_WRITE)
   __in         LONG lDistanceToMove, // 바이트 단위로 파일 포인터 이동 (양수는 앞으로, 음수는 뒤로)
-  __inout_opt  PLONG lpDistanceToMoveHigh, //
+  __inout_opt  PLONG lpDistanceToMoveHigh, // 32bit는 NULL, 64bit는 한계값 이후 받을 새로운 포인터
   __in         DWORD dwMoveMethod // 파일 포인터 시작 위치 (시작 / 0 / FILE_BEGIN, 현재 위치 / 1 / FILE_CURRENT, 끝 / 2 / FILE_END)
 );
 
