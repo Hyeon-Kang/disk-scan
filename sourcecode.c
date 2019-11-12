@@ -2,8 +2,8 @@
 #include <winbase.h>
 #include <stdio.h>
 
-#include ST32 NULL    // 4GB 이하
-#include ST64         // 4GB 이상
+//#include ST32 NULL    // 4GB 이하
+//#include ST64         // 4GB 이상
 
 // 실행 형식 : ./disk_scan (인식 드라이브 경로문자) (읽어올 디스크 용량) (긁어온 데이터 저장 경로)
 int main(int argc, char ** argv)
@@ -13,6 +13,7 @@ int main(int argc, char ** argv)
     DWORD bytesRead;  // 파일 포인터의 이동 시작 위치를 지정.
     HANDLE device = NULL; // 파일포인터를 옮기고자 하는 대상 파일의 핸들. 목표 저장장치 주소를 담을 변수로 사용.
     int numSector = 5;
+    int numSector_high = 5; //up point test
 
     device = CreateFile("\\\\.\\E:",            // HANDLE 변수에 드라이브 구조체 지정 (경로, 접근 모드, )
                         GENERIC_READ,           // 접근 모드 : 읽기
@@ -26,19 +27,22 @@ int main(int argc, char ** argv)
     if(device == INVALID_HANDLE_VALUE)
     {
         printf("CreateFile: %u\n", GetLastError());
-        return 1;
+        return -1;
     }
 
+/*
     // 64bit 이상 0xFFFFFFFF 분석
     if( (device == INVALID_SET_FILE_POINTER) && (GetLastError() != NO_ERROR) ){
       printf("CreateFile: %u\n", GetLastError());
       return 1;
     }
-
+*/
     // 저장장치 용량이 4g보다 크다면 ST64 아니면 ST32
-
-    SetFilePointer (device, numSector*512, NULL, FILE_BEGIN) ;
     // 저장장치 용량이 4GB 이하인 경우 3번째 인자는 NULL 값을 주고 2번째 인자로만 파일 위치를 지정한다.
+    //DWORD dwPos = SetFilePointer (device, numSector*512, NULL, FILE_BEGIN) ; // 32bit clearc
+
+
+    DWORD dwPos = SetFilePointer (device, numSector*512, numSector_high*512, FILE_BEGIN) ; // 64bit test
 
     // 주소 읽어오기
     if (!ReadFile(device, sector, 512, &bytesRead, NULL)) //(장치 핸들러, 읽어올 버퍼, sizeof(버퍼), 읽어온 바이트 수를 반환하기 위한 출력용 인수, 4gb 이하면 null)
