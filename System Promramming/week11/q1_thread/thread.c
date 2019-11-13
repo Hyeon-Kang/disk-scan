@@ -38,13 +38,16 @@ int main(void) {
   strcpy(stu2.major, "Computer Science");
   strcpy(stu2.univ, "TWICE Universiry");
 
-  // Pthread 실행
-  pthread_create(&t1, NULL, print_structure, &stu1);
-  pthread_create(&t2, NULL, print_structure, &stu2);
+  for(int i=0; i<10; i++) {
+    // Pthread 실행
+    pthread_create(&t1, NULL, print_structure, &stu1);
+    pthread_create(&t2, NULL, print_structure, &stu2);
 
-  // Pthread join(wait)
-  pthread_join(t1, NULL);
-  pthread_join(t2, NULL);
+    // Pthread join(wait)
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+  }
+
 
   return 0;
 }
