@@ -6,7 +6,7 @@
 #include <string.h>
 
 // mutex 선언
-pthread_mutex_t mutx;
+pthread_mutex_t mutex;
 
 // 계좌 구조체
 typedef struct{
