@@ -1,7 +1,10 @@
+
+///////////////////////////////////////////////////////
+
 // mutex를 사용한 동기화 보장 연습
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
+//#include <pthread.h>
 #include <unistd.h>
 #include <string.h>
 
@@ -10,35 +13,35 @@
 
 // 계좌 구조체
 typedef struct{
-  int balance = 0;
+  int balance;
 } account;
 
-int withdraw(struct account *account, int amount) {
+int withdraw(struct account *accounts, int amount) {
       //pthread_mutex_lock (&account->mutex);
 
-      const int balance = account->balance;
+      const int vbalance = accounts->balance;
 
       // 잔액 검사
-      if (balance < amount) {
+      if (vbalance < amount) {
             //pthread_mutex_unlock (&account->mutex);
             printf("잔액 부족\n");
             return -1;
       }
 
       // 인출 연산
-      account->balance = balance - amount;
+      accounts->balance = vbalance - amount;
       //pthread_mutex_unlock (&account->mutex);
 
-      printf("남은 금액 : %d\n", account->balance);
+      printf("남은 금액 : %d\n", accounts->balance);
 
       return 0;
 }
 
 void main () {
-      account person1;
-      person1->balance = 5000;
+      static account person1;
+      person1.balance = 5000;
 
-      withdraw(*person1, 100);
+      withdraw(&person1, 100);
 
       return 0;
 }
