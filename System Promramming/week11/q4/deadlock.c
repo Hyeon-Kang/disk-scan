@@ -18,13 +18,14 @@ pthread_mutex_t mutex;
 void function_a()
 {
       b += 5;
-      printf("function_a : b+=5\n");
+      printf("function_a : b+=5 : %d\n", b);
       sleep(1);
+      printf("a 접근 대기중\n");
       pthread_mutex_lock(&mutex);
       a +=5;
       sleep(30);
       pthread_mutex_unlock(&mutex);
-      printf("function_a : a+=5\n");
+      printf("function_a : a+=5 : %d\n", a);
 
       printf("작업완료\n");
 }
@@ -32,13 +33,14 @@ void function_a()
 void function_b()
 {
       a += 5;
-      printf("function_a : a+=5\n");
+      printf("function_b : a+=5\n");
       sleep(1);
+      printf("b 접근 대기중\n");
       pthread_mutex_lock(&mutex);
       b +=5;
       sleep(30);
       pthread_mutex_unlock(&mutex);
-      printf("function_a : b+=5\n");
+      printf("function_b : b+=5\n");
 
       printf("작업완료\n");
 }
