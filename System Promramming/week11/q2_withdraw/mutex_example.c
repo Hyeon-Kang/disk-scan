@@ -13,8 +13,6 @@ void *t_function(void *data)
     int i;
     char* thread_name = (char*)data;
 
-
-
     pthread_mutex_lock(&mutex_lock);
 
     // critical section
