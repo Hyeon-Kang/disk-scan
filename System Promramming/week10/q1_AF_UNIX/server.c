@@ -19,7 +19,7 @@ int main (int argc, char* argv[]) {
       char buf[256];
       struct sockaddr_in sin, cli;
       int sd, ns, clientlen = sizeof(cli);
-      char sendline[MAXLINE], rbuf[MAXLINE];
+      char rbuf[MAXLINE];
       char line[MAXLINE], sendline[MAXLINE], recvline[MAXLINE+1];
       pid_t pid;
       int size;
