@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
             printf("Error");
           }
           // d이름추가 끝
-          
+
           if(write(sd, sendline, strlen(sendline)) != size) {
             printf("Client: can't write to server.\n");
             return -1;
