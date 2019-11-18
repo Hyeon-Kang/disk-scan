@@ -2,12 +2,15 @@
 #include <winbase.h>
 #include <stdio.h>
 
+// INTMAX = intmax 값
+
 //#include ST32 NULL    // 4GB 이하
 //#include ST64         // 4GB 이상
 
 // 실행 형식 : ./disk_scan (인식 드라이브 경로문자) (읽어올 디스크 용량) (긁어온 데이터 저장 경로)
 int main(int argc, char ** argv)
   {
+    boolean flag = false; // 출력 검사용 flag
     int retCode = 0;
     BYTE sector[512]; // disk 내용을 읽어올 버퍼
     DWORD bytesRead;  // 파일 포인터의 이동 시작 위치를 지정.
@@ -39,10 +42,10 @@ int main(int argc, char ** argv)
 */
     // 저장장치 용량이 4g보다 크다면 ST64 아니면 ST32
     // 저장장치 용량이 4GB 이하인 경우 3번째 인자는 NULL 값을 주고 2번째 인자로만 파일 위치를 지정한다.
-    //DWORD dwPos = SetFilePointer (device, numSector*512, NULL, FILE_BEGIN) ; // 32bit clearc
+  DWORD dwPos = SetFilePointer (device, numSector*512, NULL, FILE_BEGIN) ; // 32bit clearc
 
 
-    DWORD dwPos = SetFilePointer (device, numSector*512, numSector_high*512, FILE_BEGIN) ; // 64bit test
+    //DWORD dwPos = SetFilePointer (device, numSector*512, numSector_high*512, FILE_BEGIN) ; // 64bit test
 
     // 주소 읽어오기
     if (!ReadFile(device, sector, 512, &bytesRead, NULL)) //(장치 핸들러, 읽어올 버퍼, sizeof(버퍼), 읽어온 바이트 수를 반환하기 위한 출력용 인수, 4gb 이하면 null)
@@ -62,9 +65,20 @@ int main(int argc, char ** argv)
 
     else
     {
+        // 검증용
         // 16 진수로 바이트 단위로 읽어오기, 점검을 위해 10^9승이 아닌 10^3승까지만 불러옴
-        for(int i=0; i<1000; i++) {
-              printf("%x",sector[i]);
+        int 0;
+        int buf;
+        for(int i=0; i<10000; i++) {
+              // sector[i]의 데이터가 0이 아니면 출력
+              // if (sector[i]의 데이터가 10번 연속 0이면 출력 안함)
+              buf = 0; //
+              sprintf(buf, "%x", sector[i]);
+              if(buf != 0)
+              if(cnt > 0) {
+                    printf("%x",sector[i]);
+              }
+
         }
 
         printf("\nSuccess!\n");
