@@ -1,4 +1,4 @@
-## Table of contents
+## Disk_Scanner
 * [General info](#general-info)
 * [Technologies](#technologies)
 * [Setup](#setup)
