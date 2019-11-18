@@ -12,7 +12,7 @@ int main(int argc, char ** argv)
   {
     //bool flag = false; // 출력 검사용 flag
     int retCode = 0;
-    BYTE sector[512]; // disk 내용을 읽어올 버퍼
+    BYTE sector[512]; // disk 내용을 읽어올 버퍼 (전통적으로 HDD는 섹터당 512바이트)
     DWORD bytesRead;  // 파일 포인터의 이동 시작 위치를 지정.
     HANDLE device = NULL; // 파일포인터를 옮기고자 하는 대상 파일의 핸들. 목표 저장장치 주소를 담을 변수로 사용.
     int numSector = 5;
@@ -65,20 +65,22 @@ int main(int argc, char ** argv)
 
     else
     {
+      // 디스크 사이즈 알아낸 다음 나눠서 계속 파일 쓰게 시킴
         // 검증용
         // 16 진수로 바이트 단위로 읽어오기, 점검을 위해 10^9승이 아닌 10^3승까지만 불러옴
         int cnt =0;
         int buf =0;
 
-        FILE * fp = NULL;
+        // FILE * fp = NULL;
+        //
+        // fp = fopen("D:\write_test\test.txt", "w+");
+        // if(fp == NULL) {
+        //       printf("FILE OPEN ERROR!");
+        //       exit(0);
+        // }
 
-        fp = fopen("D:\write_test\test.txt", "w+");
-        if(fp == NULL) {
-              printf("FILE OPEN ERROR!");
-              exit(0);
-        }
-
-        for(int i=0; i<100000; i++) {
+        // 저장장치 용량을 가져와 반복횟수 구현하기
+        for(int i=0; i<10000; i++) {
               // sprintf(buf, "%d", sector[i]);
               // if(buf != 0) {
               //       cnt++;
@@ -87,13 +89,13 @@ int main(int argc, char ** argv)
               //       }
               //
               // }
-              printf("%x",sector[i]);
-              fprintf(fp, "%x", sector[i]);
+              printf("%x",sector);
+              //fprintf(fp, "%x", sector[i]);
         }
 
         printf("\nSuccess!\n");
 
-        fclose(fp);
+        //fclose(fp);
     }
 
     // 파일 저장
