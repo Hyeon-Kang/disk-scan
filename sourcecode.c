@@ -10,7 +10,7 @@
 // 실행 형식 : ./disk_scan (인식 드라이브 경로문자) (읽어올 디스크 용량) (긁어온 데이터 저장 경로)
 int main(int argc, char ** argv)
   {
-    boolean flag = false; // 출력 검사용 flag
+    //bool flag = false; // 출력 검사용 flag
     int retCode = 0;
     BYTE sector[512]; // disk 내용을 읽어올 버퍼
     DWORD bytesRead;  // 파일 포인터의 이동 시작 위치를 지정.
@@ -67,21 +67,33 @@ int main(int argc, char ** argv)
     {
         // 검증용
         // 16 진수로 바이트 단위로 읽어오기, 점검을 위해 10^9승이 아닌 10^3승까지만 불러옴
-        int 0;
-        int buf;
-        for(int i=0; i<10000; i++) {
-              // sector[i]의 데이터가 0이 아니면 출력
-              // if (sector[i]의 데이터가 10번 연속 0이면 출력 안함)
-              buf = 0; //
-              sprintf(buf, "%x", sector[i]);
-              if(buf != 0)
-              if(cnt > 0) {
-                    printf("%x",sector[i]);
-              }
+        int cnt =0;
+        int buf =0;
 
+        FILE * fp = NULL;
+
+        fp = fopen("D:\write_test\test.txt", "w+");
+        if(fp == NULL) {
+              printf("FILE OPEN ERROR!");
+              exit(0);
+        }
+
+        for(int i=0; i<100000; i++) {
+              // sprintf(buf, "%d", sector[i]);
+              // if(buf != 0) {
+              //       cnt++;
+              //       if(cnt>0){
+              //             printf("%x",sector[i]);
+              //       }
+              //
+              // }
+              printf("%x",sector[i]);
+              fprintf(fp, "%x", sector[i]);
         }
 
         printf("\nSuccess!\n");
+
+        fclose(fp);
     }
 
     // 파일 저장
