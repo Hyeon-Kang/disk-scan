@@ -1,9 +1,9 @@
 ## Disk_Scanner
-* [General info](#general-info)
+* [기술 개요](#기술-개요)
 * [Technologies](#technologies)
 * [Setup](#setup)
 
-## General info
+## 기술 개요
 This project is simple Lorem ipsum dolor generator.
 	
 ## Technologies
