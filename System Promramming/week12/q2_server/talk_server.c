@@ -1,5 +1,11 @@
 //출처 : http://jkkang.net/unix/netprg/source/talk_server.c
 
+/*------------------------------------------------------------------------------------------------------------
+파일명 : talk_server.c
+기 능 : 토크 클라이언트와 1:1 통신을 한다.
+컴파일 : cc -o talk_server talk_server.c readline.c -lsocket -lnsl
+사용예 : talk_server 3000
+-------------------------------------------------------------------------------------------------------------*/ 
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>

@@ -1,5 +1,11 @@
-//출처 : http://jkkang.net/unix/netprg/source/talk_server.c
+//출처 : http://jkkang.net/unix/netprg/source/talk_client.c
 
+/*----------------------------------------------------------------------------------------------------------------
+파일명 : talk_client.c
+기 능 : 토크 서버와 1:1 통신을 하는 클라이언트 프로그램
+컴파일 : cc -o talk_client talk_client.c readline.c -lsocket -lnsl
+사용예 : talk_client 192.203.144.11 3000
+----------------------------------------------------------------------------------------------------------------*/ 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -45,7 +51,7 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  if(( pid = fork()) > 0 {
+  if(( pid = fork()) > 0) {
     /* 부모 프로세스는 키보드 입력을 서버로 전송 */
     while(readline(0, sendline,MAXLINE) != 0) {
       size = strlen(sendline);
@@ -70,7 +76,7 @@ int main(int argc, char *argv[]) {
       }
     }
   }
-  close(s); 
+  close(s);
 
 
   int readline(int fd, char *ptr, int maxlen) {
