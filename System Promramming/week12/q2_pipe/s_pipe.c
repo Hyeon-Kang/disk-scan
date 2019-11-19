@@ -24,6 +24,7 @@ int main (int argc, char * argv[]) {
   int pd, n;
   char inmsg[MAXLINE];
   char sendline[MAXLINE], line[MAXLINE];
+  char filename[80];
   pid_t pid;
   int size;
 
@@ -80,28 +81,60 @@ int main (int argc, char * argv[]) {
               while ((n = read(pd, inmsg, MAXLINE)) > 0) {
                     write(1, inmsg, n);
                     if(strstr (inmsg, "<GET>") != NULL){ // <GET> 검사
-                          printf("<GET> 감지\n"); // test
+                          //printf("<GET> 감지\n"); // test
                           char *sArr[80] = { NULL, };
                           char f_name[80];
                           int i = 0;
                           char *p = NULL;
                           p = strtok(inmsg, " ");
-
                           bool flag = false;
                           while (p != NULL){
-                                puts(p);
+                                //puts(p);
                                 i++;
                                 p = strtok(NULL, " ");
-                                 if(strcmp(p, "<GET>") == 0){
+                                if(flag == true) {
+                                      strcpy(sArr, p);
+                                      printf("데이터 요청: %s\n", sArr);
+
+
+                                      flag = false;
+
+                                      // 파일 열기 절차
+                                      printf("SYSTEM : open %s\n",sArr);
+                                      strcpy(filename, "./");
+                                      strcpy(filename, sArr);
+                                      printf("경로 예제 : %s", filename);
+
+                                      if( (FILE * fp = fopen(filename, "r")) == -1) {
+                                            printf("파일이 없습니다.");
+                                            // 파일 없다고 메시지 전송 추가
+                                            if ((pd = open("./server_write", O_WRONLY)) == -1) {
+                                                  perror("open");
+                                                  exit(1);
+                                            }
+
+                                            while(readline(0, sendline, MAXLINE) != 0) { // 표준 입력 가져오기
+                                                  size = strlen("파일이 없습니다.\n");
+                                                  // 이름 추가
+                                                  sprintf(line, "%s %s", argv[1], "파일이 없습니다.\n");
+                                    
+                                                  n = write(pd, line, strlen(line)+1);
+                                                  if (n == -1) {
+                                                        perror("write");
+                                                        exit(1);
+                                                  }
+                                            }
+                                      }
+                                      // 파일 데이터 가져오기
+                                      char string[255]; // 문자열 저장할 배열
+                                      fscanf(fp, "%s", string);
+                                      // 가져온 데이터 전송
+                                }
+                                if(strcmp(p, "<GET>") == 0){
                                       flag = true;
-                                 }
-                                 if(flag == true) {
-                                       sArr = p;
-                                       printf("%s\n", sArr);
-                                       flag = false;
-                                 }
+                                }
                           }
-                          printf("데이터 요청 : %s\n", sArr);
+                          //printf("데이터 요청 : %s\n", sArr);
                     }
               }// 서버가 보낸 데이터 읽기
 
