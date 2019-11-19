@@ -14,6 +14,8 @@
 #include <string.h>
 #include <signal.h>
 
+typedef enum {false, true} bool;
+
 #define MAXLINE 256
 
 int readline(int, char *, int); // 한줄씩 읽기 함수
@@ -23,6 +25,7 @@ int main (int argc, char * argv[]) {
   char inmsg[MAXLINE];
   char sendline[MAXLINE], line[MAXLINE];
   pid_t pid;
+  int size;
 
   char *escapechar = "exit\n";	/* 종료문자 */
 
@@ -60,8 +63,6 @@ int main (int argc, char * argv[]) {
                 break;
               }
         }
-
-
         //close(pd);
 
   } else { // 자식의 경우
@@ -75,11 +76,35 @@ int main (int argc, char * argv[]) {
                     perror("open");
                     exit(1);
               }
-              //printf("Client =====\n");
-              //write(1, "From Servver :", 13);
 
-              while ((n = read(pd, inmsg, MAXLINE)) > 0) // 서버가 보낸 데이터 읽기
+              while ((n = read(pd, inmsg, MAXLINE)) > 0) {
                     write(1, inmsg, n);
+                    if(strstr (inmsg, "<GET>") != NULL){ // <GET> 검사
+                          printf("<GET> 감지\n"); // test
+                          char *sArr[80] = { NULL, };
+                          char f_name[80];
+                          int i = 0;
+                          char *p = NULL;
+                          p = strtok(inmsg, " ");
+
+                          bool flag = false;
+                          while (p != NULL){
+                                puts(p);
+                                i++;
+                                p = strtok(NULL, " ");
+                                 if(strcmp(p, "<GET>") == 0){
+                                      flag = true;
+                                 }
+                                 if(flag == true) {
+                                       sArr = p;
+                                       printf("%s\n", sArr);
+                                       flag = false;
+                                 }
+                          }
+                          printf("데이터 요청 : %s\n", sArr);
+                    }
+              }// 서버가 보낸 데이터 읽기
+
 
               if (n == -1) {
                     perror("read");

@@ -15,6 +15,7 @@ int main (int argc, char * argv[]) {
   char inmsg[MAXLINE];
   char sendline[MAXLINE], line[MAXLINE];
   pid_t pid;
+  int size;
 
   char *escapechar = "exit\n";	/* 종료문자 */
 
