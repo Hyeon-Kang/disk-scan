@@ -1,12 +1,4 @@
-// gcc -o name s_pipe.c
-// 실행 : ./name [상대에게 보여줄 식별 이름]
 
-// pipe를 이용한 채팅 프로그램
-// <GET> aaa.txt 입력 시 aaa.txt 다운로드
-// 입력 받은 값에서 strstr 함수로 <GET> 문자열 찾기
-// 해당 문자열 발견 시 offset 6부터 문자열 파싱함
-// 파싱한 문자열의 텍스트가 서버의 디렉토리에 있다면
-// 해당 파일 복사하여 open write 모드로 저장
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -30,13 +22,13 @@ int main (int argc, char * argv[]) {
   if(( pid = fork()) > 0) {
         // send
 
-        // 서버가 작성할 파이프 생성
-        if(mkfifo("./server_write", 0666) == -1) {
-              perror("mkfifo");
-              exit(1);
-        }
+        // 클라이언트가 작성할 파이프 생성
+        // if(mkfifo("./client_write", 0666) == -1) {
+        //       perror("mkfifo");
+        //       exit(1);
+        // }
 
-        if ((pd = open("./server_write", O_WRONLY)) == -1) {
+        if ((pd = open("./client_write", O_WRONLY)) == -1) {
               perror("open");
               exit(1);
         }
@@ -51,7 +43,10 @@ int main (int argc, char * argv[]) {
                     perror("write");
                     exit(1);
               }
-
+              // d이름추가 끝
+              // if(write(ns, sendline, strlen(sendline)) != size) {
+              //   printf("Server: fail in writing\n");
+              // }
               /* 종료 문자열 입력 확인 */
               if(strncmp(sendline, escapechar, 4) == 0) {
                 printf("close chat_server.\n");
@@ -66,12 +61,7 @@ int main (int argc, char * argv[]) {
 
   } else { // 자식의 경우
               // receive
-              // 클라이언트가 작성할 파이프 생성
-              if(mkfifo("./client_write", 0666) == -1) {
-                    perror("mkfifo");
-                    exit(1);
-              }
-              if ((pd = open ("./client_write", O_RDONLY)) == -1) { // 서버에서 생성한 FIFO 열기
+              if ((pd = open ("./server_write", O_RDONLY)) == -1) { // 서버에서 생성한 FIFO 열기
                     perror("open");
                     exit(1);
               }
