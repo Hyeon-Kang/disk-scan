@@ -105,9 +105,12 @@ int main (int argc, char * argv[]) {
                                       printf("경로 예제 : %s", filename);
 
                                       if( (FILE * fp = fopen(filename, "r")) == -1) {
-                                            printf("파일이 없습니다.");
-                                            // 파일 없다고 메시지 전송 추가
-                                            if ((pd = open("./server_write", O_WRONLY)) == -1) {
+                                              // 파일 없다고 메시지 전송 추가
+                                              printf("파일이 없습니다.");
+                                      } else {
+                                            // 해당 파일 열기 성공 시 진행
+                                            // 파이프 디스크립터로 서버 작성공간 쓰기모드로 열고 <RDY> 메시지 날리기
+                                            if ((pd_w = open("./server_write", O_WRONLY)) == -1) {
                                                   perror("open");
                                                   exit(1);
                                             }
@@ -115,20 +118,22 @@ int main (int argc, char * argv[]) {
                                             while(readline(0, sendline, MAXLINE) != 0) { // 표준 입력 가져오기
                                                   size = strlen("파일이 없습니다.\n");
                                                   // 이름 추가
-                                                  sprintf(line, "%s %s", argv[1], "파일이 없습니다.\n");
+                                                  char *ready = "<RDY>";
+                                                  //sprintf(line, "%s %s", argv[1], "파일이 없습니다.\n");
 
-                                                  n = write(pd, line, strlen(line)+1);
+                                                  n = write(pd_w, ready, strlen(ready)+1); // <RDY> 메시지 전송
                                                   if (n == -1) {
                                                         perror("write");
                                                         exit(1);
                                                   }
-                                            }
-                                      }
+                                            } // end while
+                                      } // end else
+
                                       // 파일 데이터 가져오기
                                       char string[255]; // 문자열 저장할 배열
                                       fscanf(fp, "%s", string);
                                       // 가져온 데이터 전송
-                                }
+                                } // end if flag == true
                                 if(strcmp(p, "<GET>") == 0){
                                       flag = true;
                                 }
