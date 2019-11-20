@@ -24,8 +24,8 @@
 typedef enum {false, true} bool;
 
 #define MAXLINE 256
-
-int readline(int, char *, int); // 한줄씩 읽기 함수
+void text_check(int n); // 텍스트 전송 검사 함수
+int readline(int, char *, int); // 터미널 입력 한줄씩 읽기 함수
 
 int main (int argc, char * argv[]) {
       int pdw, pdr, n; // 파이프 디스크립터, 문자열 디스크립터
@@ -43,23 +43,6 @@ int main (int argc, char * argv[]) {
       char *escapechar = "exit\n";	/* 종료문자 */
 
       //부모 스레드 (server_write 파이프에 쓰기)
-
-      /* 절차 설명
-      파이프 생성
-      파이프 쓰기모드로 열기
-
-      반복문
-      *** ready_flag = true 인 경우 바로 <RDY> 전송
-      *** sleep(1);
-      *** 이어서 send_text 전송
-      *** sleep(1);
-      *** <EOF> 메시지 전송
-      *** ready_flag = false;
-
-      터미널 내용에서 개행 입력시 끊어서 문자열 변수로 저장
-      저장 변수에서 종료문자 감시
-      해당 문자열 변수 전송*/
-
       if( (pid = fork()) > 0) {
 
             // 파이프 생성
@@ -99,7 +82,12 @@ int main (int argc, char * argv[]) {
                         size = strlen(sendline);
 
                         // 이름 추가 절차 (생략)
-                        
+
+                        // 파이프에 작성 (본래 이름까지 병합하여 line이지만 테스트이므로 sendline 바로 전송)
+                        n = write(pdw, sendline, strlen(sendline));
+
+
+
                   }
 
               // 종료 입력 감시
@@ -110,11 +98,12 @@ int main (int argc, char * argv[]) {
 
       }
 
-
-
-
-
-
+  void text_check(int n) {
+        if (n == -1) {
+              perror("write message 오류");
+              exit(1);
+        }
+  }
 
   int readline(int fd, char *ptr, int maxlen) {
         int n, rc;
