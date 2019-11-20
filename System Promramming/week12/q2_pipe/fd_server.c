@@ -28,19 +28,38 @@ typedef enum {false, true} bool;
 int readline(int, char *, int); // 한줄씩 읽기 함수
 
 int main (int argc, char * argv[]) {
-      int pd, n;
-      char inmsg[MAXLINE];
-      char sendline[MAXLINE], line[MAXLINE];
-      char filename[80];
-      pid_t pid;
-      int size;
+      int pdw, pdr, n; // 파이프 디스크립터, 문자열 디스크립터
+      char inmsg[MAXLINE]; // 받는 메시지
+      char sendline[MAXLINE], line[MAXLINE]; //보낼 메시지
+      char filename[80]; // 추출한 파일 제목 저장
+      pid_t pid; // pid 저장
+      int size; // 메시지 사이즈
 
-      char *ready = "<RDY>";
+      char *ready = "<RDY>"; // 전송 준비완료 알림 메시지
+      char *eof = "<EOF>"; // 전송 종료 알림 메시지
       bool ready_flag = false; // <RDY> 메시지 전송
+      char send_text[MAXLINE]; // 전송할 파일 내용
 
       char *escapechar = "exit\n";	/* 종료문자 */
 
       //부모 스레드 (server_write 파이프에 쓰기)
+
+      /* 절차 설명
+      파이프 생성
+      파이프 쓰기모드로 열기
+
+      반복문
+      *** ready_flag = true 인 경우 바로 <RDY> 전송
+      *** sleep(1);
+      *** 이어서 send_text 전송
+      *** sleep(1);
+      *** <EOF> 메시지 전송
+      *** ready_flag = false;
+
+      터미널 내용에서 개행 입력시 끊어서 문자열 변수로 저장
+      저장 변수에서 종료문자 감시
+      해당 문자열 변수 전송*/
+
       if( (pid = fork()) > 0) {
 
             // 파이프 생성
@@ -55,10 +74,40 @@ int main (int argc, char * argv[]) {
                   exit(1);
             }
 
-            // 터미널 입력 가져오기
-            // 종료 입력 감시
-            // 파이프에 작성
-            //
+            // 반복문 수행
+            while(1) {
+                  // 파일 전송절차 실행
+                  // *** ready_flag = true 인 경우 바로 <RDY> 전송 (파일 전송절차 실행)
+                  if(ready_flag = true) {
+                        sleep(1); // 잠깐 쉬고
+                        n = write(pdw, ready, strlen(ready)+1); // <RDY> 메시지 전송
+                        // 메시지 전송 n 오류 처리
+                        if (n == -1) {
+                              perror("write message 오류");
+                              exit(1);
+                        }
+                        // 이어서 send_text 전송 (EOF 포함 256자리 넘어가면 깨짐!!)
+                        n = write(pdw, send_text, strlen(send_text)+1); // 읽어온 파일 내용 전송
+                        sleep(1); // 잠깐 쉬기 (클라이언트 처리를 위한 여유 시간)
+                        n = write(pdw, eof, strlen(eof)+1); // <EOF> 메시지 전송
+                        ready_flag = false; //ready_flag = false;
+                  } // 파일 전송절차 종료
+
+                  // 터미널 입력 가져오기
+                  if(readline(0, sendline, MAXLINE) != 0) {
+                        // 입력할 메시지 사이즈 계산
+                        size = strlen(sendline);
+
+                        // 이름 추가 절차 (생략)
+                        
+                  }
+
+              // 종료 입력 감시
+              // 파이프에 작성
+              //
+            }
+
+
       }
 
 

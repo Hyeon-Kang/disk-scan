@@ -38,6 +38,15 @@ int main (int argc, char * argv[]) {
       char *escapechar = "exit\n";	/* 종료문자 */
 
       //부모 스레드 (client_write 파이프에 쓰기)
+
+      /* 절차 설명
+      파이프 생성
+      파이프 쓰기모드로 열기
+      * 
+      터미널 내용에서 개행 입력시 끊어서 문자열 변수로 저장
+      저장 변수
+      해당 문자열 변수 전송*/
+
       if( (pid = fork()) > 0) {
 
             // 파이프 생성
