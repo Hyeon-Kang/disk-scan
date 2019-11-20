@@ -27,22 +27,24 @@ typedef enum {false, true} bool;
 void text_check(int n); // 텍스트 전송오류 검사 함수
 int readline(int, char *, int); // 터미널 입력 한줄씩 읽기 함수
 
+// 공유 자원
+bool ready_flag = false; // <RDY> 메시지 전송
+bool error_flag = false; // <err> 메시지 전송
+char send_text[MAXLINE]; // 전송할 파일 내용
+char filename[MAXLINE]; // 추출한 파일 제목 저장
+
 int main (int argc, char * argv[]) {
       int pdw, pdr, n; // 파이프 디스크립터, 문자열 디스크립터
       char inmsg[MAXLINE]; // 받는 메시지
       char sendline[MAXLINE], line[MAXLINE]; //보낼 메시지
-      char filename[80]; // 추출한 파일 제목 저장
+
       pid_t pid; // pid 저장
       int size; // 메시지 사이즈
 
       char *ready = "<RDY>"; // 전송 준비완료 알림 메시지
       char *eof = "<EOF>"; // 전송 종료 알림 메시지
-      bool ready_flag = false; // <RDY> 메시지 전송
-      char send_text[MAXLINE]; // 전송할 파일 내용
 
-      bool error_flag = false;
       char *err = "파일이 존재하지 않습니다.";
-
       char *escapechar = "exit\n";	/* 종료문자 */
 
       //부모 스레드 (server_write 파이프에 쓰기)
@@ -124,11 +126,14 @@ int main (int argc, char * argv[]) {
             추출한 파일 이름이 있다면 (fopen, "r" != -1)
             파일을 열고 내용을 send_text 변수에 저장하고
             파일 디스크립터를 닫고
-            ready_flag를 true로 바꾼다. -> (내부 파이프를 통해 부모에게 ready_true 전달)
+            ready_flag를 true로 바꾼다. -> (내부 파이프를 통해 부모에게 ready_true 전달) -> 공유 자원으로 해결
+            // ** 해보고 씹히는거 같으면 2번 보내자
+            내부 파이프로 메시지를 보낸 뒤에는 아무 문자나 보내서 파이프 메시지 초기화
 
             만약 -1로 존재하지 않는 경우
             아무것도 건드리지 않고
-            error_flag를 true로 한다. -> 내부 파이프를 통해 부모에게 error_true 전달
+            error_flag를 true로 한다. -> 내부 파이프를 통해 부모에게 error_true 전달 -> 공유 자원으로 해결
+            내부 파이프로 메시지를 보낸 뒤에는 아무 문자나 보내서 파이프 메시지 초기화
              */
 
             // 파이프 생성
@@ -146,7 +151,11 @@ int main (int argc, char * argv[]) {
             // 반복문 수행
             while(1) {
                   // 메시지 읽어오기
-                  n =
+                  n = (read(pdr, inmsg, MAXLINE) > 0);
+                  // 터미널에 메시지 출력
+                  write(1, inmsg, n);
+
+                  // <GET> 감지
             }// 반복문 종료
       } // 자식 스레드 종료
 
