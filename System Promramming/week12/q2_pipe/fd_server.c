@@ -24,7 +24,7 @@
 typedef enum {false, true} bool;
 
 #define MAXLINE 256
-void text_check(int n); // 텍스트 전송 검사 함수
+void text_check(int n); // 텍스트 전송오류 검사 함수
 int readline(int, char *, int); // 터미널 입력 한줄씩 읽기 함수
 
 int main (int argc, char * argv[]) {
@@ -71,8 +71,10 @@ int main (int argc, char * argv[]) {
                         }
                         // 이어서 send_text 전송 (EOF 포함 256자리 넘어가면 깨짐!!)
                         n = write(pdw, send_text, strlen(send_text)+1); // 읽어온 파일 내용 전송
+                        text_check(n); // 파이프 작성 오류 검사
                         sleep(1); // 잠깐 쉬기 (클라이언트 처리를 위한 여유 시간)
                         n = write(pdw, eof, strlen(eof)+1); // <EOF> 메시지 전송
+                        text_check(n);
                         ready_flag = false; //ready_flag = false;
                   } // 파일 전송절차 종료
 
@@ -83,8 +85,18 @@ int main (int argc, char * argv[]) {
 
                         // 이름 추가 절차 (생략)
 
+                        // 종료 입력 감시 (커맨드 : exit\n)
+                        if(strcmp(sendline, escapechar, 4) == 0) {
+                              printf("채팅 서버를 닫습니다.");
+                              close(pdw); // 파이프 디스크립터 닫기
+                              break; // 반복문 탈출
+                        }
+
                         // 파이프에 작성 (본래 이름까지 병합하여 line이지만 테스트이므로 sendline 바로 전송)
-                        n = write(pdw, sendline, strlen(sendline));
+                        n = write(pdw, sendline, strlen(sendline)+1);
+                        text_check(n);
+
+
 
 
 
@@ -93,11 +105,17 @@ int main (int argc, char * argv[]) {
               // 종료 입력 감시
               // 파이프에 작성
               //
-            }
+            } // end while
+
+            return 0;
+      } // 부모 스레드
+      else {
 
 
-      }
+      } // 자식 스레드
 
+
+  // 파이프에 메시지 작성이 정상적으로 됬는지 검사하는 함수
   void text_check(int n) {
         if (n == -1) {
               perror("write message 오류");
@@ -105,6 +123,7 @@ int main (int argc, char * argv[]) {
         }
   }
 
+  // 한 줄씩 읽어오는 함수
   int readline(int fd, char *ptr, int maxlen) {
         int n, rc;
         char c;
