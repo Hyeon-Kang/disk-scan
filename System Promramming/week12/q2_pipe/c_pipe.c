@@ -23,12 +23,6 @@ int main (int argc, char * argv[]) {
   if(( pid = fork()) > 0) {
         // send
 
-        // 클라이언트가 작성할 파이프 생성
-        // if(mkfifo("./client_write", 0666) == -1) {
-        //       perror("mkfifo");
-        //       exit(1);
-        // }
-
         if ((pd = open("./client_write", O_WRONLY)) == -1) {
               perror("open");
               exit(1);
@@ -44,10 +38,7 @@ int main (int argc, char * argv[]) {
                     perror("write");
                     exit(1);
               }
-              // d이름추가 끝
-              // if(write(ns, sendline, strlen(sendline)) != size) {
-              //   printf("Server: fail in writing\n");
-              // }
+
               /* 종료 문자열 입력 확인 */
               if(strncmp(sendline, escapechar, 4) == 0) {
                 printf("close chat_server.\n");
@@ -57,20 +48,21 @@ int main (int argc, char * argv[]) {
               }
         }
 
-
-        //close(pd);
-
   } else { // 자식의 경우
               // receive
               if ((pd = open ("./server_write", O_RDONLY)) == -1) { // 서버에서 생성한 FIFO 열기
                     perror("open");
                     exit(1);
               }
-              //printf("Client =====\n");
-              //write(1, "From Servver :", 13);
 
               while ((n = read(pd, inmsg, MAXLINE)) > 0) // 서버가 보낸 데이터 읽기
                     write(1, inmsg, n);
+                    // <RDY> 감지
+                    if(strstr (inmsg, "<RDY>") != NULL){ 
+                    // <GET> 에서 파일 이름 따로 저장해온거 가져와서
+                    // 파일 쓰기모드로 오픈
+                    // 다음에 받은 데이터 저장
+                    // 디스크립터 닫기
 
               if (n == -1) {
                     perror("read");
