@@ -106,7 +106,7 @@ int main (int argc, char * argv[]) {
 
                                       if( (FILE * fp = fopen(filename, "r")) == -1) {
                                               // 파일 없다고 메시지 전송 추가
-                                              printf("파일이 없습니다.");
+                                              printf("파일열기 오류.");
                                       } else {
                                             // 해당 파일 열기 성공 시 진행
                                             // 파이프 디스크립터로 서버 작성공간 쓰기모드로 열고 <RDY> 메시지 날리기
@@ -130,6 +130,7 @@ int main (int argc, char * argv[]) {
                                       } // end else
 
                                       // 파일 데이터 가져오기
+                                      printf("파일 데이터 가져오기\n");
                                       char string[255]; // 문자열 저장할 배열
                                       fscanf(fp, "%s", string);
                                       // 가져온 데이터 전송
