@@ -62,12 +62,15 @@ int main (int argc, char * argv[]) {
 
             // 반복문 수행
             while(1) {
+                  // 자식을 통해 파이프로 받은 메시지가 errror_true 인 경우 error_flag = true;
+                  // 자식을 통해 파이프로 받은 메시지가 ready_true 인 경우 ready_flag = true;
+
                   // 파일이 존재하지 않는 경우
                   if(error_flag == true) {
                           n = write(pdw, err, strlen(err)+1); // err 메시지 전송
                           error_flag = false;
                   }
-                  
+
                   // 파일 전송절차 실행
                   // *** ready_flag = true 인 경우 바로 <RDY> 전송 (파일 전송절차 실행)
                   if(ready_flag == true) {
@@ -113,6 +116,7 @@ int main (int argc, char * argv[]) {
       } // 부모 스레드 종료
       else { // client_write에서 메시지를 읽어올 자식스레드
             /* 절차 설명
+            서버 프로그램이므로 파이프 생성 및 열기
             메시지를 읽어온다.
             <GET>이 감지가 되면
             사용할 저장 변수 filename과 send_text를 NULL로 초기화 한다.
@@ -120,14 +124,30 @@ int main (int argc, char * argv[]) {
             추출한 파일 이름이 있다면 (fopen, "r" != -1)
             파일을 열고 내용을 send_text 변수에 저장하고
             파일 디스크립터를 닫고
-            ready_flag를 true로 바꾼다.
+            ready_flag를 true로 바꾼다. -> (내부 파이프를 통해 부모에게 ready_true 전달)
 
             만약 -1로 존재하지 않는 경우
             아무것도 건드리지 않고
-            error_flag를 true로 한다.
+            error_flag를 true로 한다. -> 내부 파이프를 통해 부모에게 error_true 전달
              */
 
+            // 파이프 생성
+            if(mkfifo("./client_write", 0666) == -1) {
+                  perror("fifo 생성 오류");
+                  exit(1);
+            }
 
+            // 파이프 쓰기모드로 열기
+            if((pdw = open("./client_write", O_RDONLY)) == -1) {
+                  perror("pipe discriptor 열기 실패");
+                  exit(1);
+            }
+
+            // 반복문 수행
+            while(1) {
+                  // 메시지 읽어오기
+                  n =
+            }// 반복문 종료
       } // 자식 스레드 종료
 
       return 0;
