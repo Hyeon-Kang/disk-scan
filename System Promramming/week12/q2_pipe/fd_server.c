@@ -40,6 +40,9 @@ int main (int argc, char * argv[]) {
       bool ready_flag = false; // <RDY> 메시지 전송
       char send_text[MAXLINE]; // 전송할 파일 내용
 
+      bool error_flag = false;
+      char *err = "파일이 존재하지 않습니다.";
+
       char *escapechar = "exit\n";	/* 종료문자 */
 
       //부모 스레드 (server_write 파이프에 쓰기)
@@ -59,9 +62,15 @@ int main (int argc, char * argv[]) {
 
             // 반복문 수행
             while(1) {
+                  // 파일이 존재하지 않는 경우
+                  if(error_flag == true) {
+                          n = write(pdw, err, strlen(err)+1); // err 메시지 전송
+                          error_flag = false;
+                  }
+                  
                   // 파일 전송절차 실행
                   // *** ready_flag = true 인 경우 바로 <RDY> 전송 (파일 전송절차 실행)
-                  if(ready_flag = true) {
+                  if(ready_flag == true) {
                         sleep(1); // 잠깐 쉬고
                         n = write(pdw, ready, strlen(ready)+1); // <RDY> 메시지 전송
                         // 메시지 전송 n 오류 처리
@@ -96,24 +105,33 @@ int main (int argc, char * argv[]) {
                         n = write(pdw, sendline, strlen(sendline)+1);
                         text_check(n);
 
-
-
-
-
-                  }
-
-              // 종료 입력 감시
-              // 파이프에 작성
-              //
+                  } // 터미널 입력 가져오기 종료
             } // end while
 
-            return 0;
-      } // 부모 스레드
-      else {
+            // 자식스레드 종료 기다리기 추가해야 하나???
+
+      } // 부모 스레드 종료
+      else { // client_write에서 메시지를 읽어올 자식스레드
+            /* 절차 설명
+            메시지를 읽어온다.
+            <GET>이 감지가 되면
+            사용할 저장 변수 filename과 send_text를 NULL로 초기화 한다.
+            파싱을 해서 파일 이름을 추출하여 filename에 저장한다.
+            추출한 파일 이름이 있다면 (fopen, "r" != -1)
+            파일을 열고 내용을 send_text 변수에 저장하고
+            파일 디스크립터를 닫고
+            ready_flag를 true로 바꾼다.
+
+            만약 -1로 존재하지 않는 경우
+            아무것도 건드리지 않고
+            error_flag를 true로 한다.
+             */
 
 
-      } // 자식 스레드
+      } // 자식 스레드 종료
 
+      return 0;
+} // end main
 
   // 파이프에 메시지 작성이 정상적으로 됬는지 검사하는 함수
   void text_check(int n) {
