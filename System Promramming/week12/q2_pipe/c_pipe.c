@@ -6,6 +6,8 @@
 #include <string.h>
 #include <signal.h>
 
+typedef enum {false, true} bool;
+
 #define MAXLINE 256
 
 int readline(int, char *, int); // 한줄씩 읽기 함수
@@ -38,6 +40,17 @@ int main (int argc, char * argv[]) {
                     perror("write");
                     exit(1);
               }
+              // <GET> 커맨드 감지, 파일 이름 저장
+              if(strstr(line, "<GET>") != NULL) {
+                      printf("<GET> 감지, filename 추출 준비\n"); // test
+                      char *sArr[80] = {NULL,};
+                      char f_name[80];
+                      int i =0;
+                      p = strtok(line, " ");
+                      bool flag = false;
+
+              }
+
 
               /* 종료 문자열 입력 확인 */
               if(strncmp(sendline, escapechar, 4) == 0) {
@@ -58,8 +71,8 @@ int main (int argc, char * argv[]) {
               while ((n = read(pd, inmsg, MAXLINE)) > 0) // 서버가 보낸 데이터 읽기
                     write(1, inmsg, n);
                     // <RDY> 감지
-                    if(strstr (inmsg, "<RDY>") != NULL){ 
-                    // <GET> 에서 파일 이름 따로 저장해온거 가져와서
+                    if(strstr (inmsg, "<RDY>") != NULL){
+                    // <GET> 에서 파일 이름 따로 저장해온거 가져와서666
                     // 파일 쓰기모드로 오픈
                     // 다음에 받은 데이터 저장
                     // 디스크립터 닫기

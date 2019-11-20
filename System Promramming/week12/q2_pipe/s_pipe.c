@@ -30,7 +30,7 @@ int main (int argc, char * argv[]) {
 
   char *escapechar = "exit\n";	/* 종료문자 */
 
-  // 부모의 경우
+  // 부모의 경우 (쓰기)
   if(( pid = fork()) > 0) {
         // send
 
@@ -66,7 +66,7 @@ int main (int argc, char * argv[]) {
         }
         //close(pd);
 
-  } else { // 자식의 경우
+  } else { // 자식의 경우 (읽기)
               // receive
               // 클라이언트가 작성할 파이프 생성
               if(mkfifo("./client_write", 0666) == -1) {
@@ -117,7 +117,7 @@ int main (int argc, char * argv[]) {
                                                   size = strlen("파일이 없습니다.\n");
                                                   // 이름 추가
                                                   sprintf(line, "%s %s", argv[1], "파일이 없습니다.\n");
-                                    
+
                                                   n = write(pd, line, strlen(line)+1);
                                                   if (n == -1) {
                                                         perror("write");
