@@ -48,6 +48,21 @@ int main (int argc, char * argv[]) {
                       int i =0;
                       p = strtok(line, " ");
                       bool flag = false;
+                      // 파일 토큰화
+                      while (p != NULL){
+                            //puts(p);
+                            //i++;
+                            p = strtok(NULL, " ");
+                            if(flag == true) {
+                                  strcpy(sArr, p);
+                                  printf("데이터 요청: %s\n", sArr);
+                                  flag = false;
+
+                                  // 파일 열기 절차
+                                  printf("SYSTEM : open %s\n",sArr);
+                                  strcpy(filename, "./");
+                                  strcpy(filename, sArr);
+                                  printf("경로 예제 : %s", filename);
 
               }
 

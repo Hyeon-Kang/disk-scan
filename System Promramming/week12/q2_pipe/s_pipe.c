@@ -40,7 +40,7 @@ int main (int argc, char * argv[]) {
               exit(1);
         }
 
-        if ((pd = open("./server_write", O_WRONLY)) == -1) {
+        if ((pdw = open("./server_write", O_WRONLY)) == -1) {
               perror("open");
               exit(1);
         }
@@ -50,7 +50,7 @@ int main (int argc, char * argv[]) {
               // 이름 추가
               sprintf(line, "%s %s", argv[1], sendline);
 
-              n = write(pd, line, strlen(line)+1);
+              n = write(pdw, line, strlen(line)+1);
               if (n == -1) {
                     perror("write");
                     exit(1);
@@ -59,7 +59,7 @@ int main (int argc, char * argv[]) {
               /* 종료 문자열 입력 확인 */
               if(strncmp(sendline, escapechar, 4) == 0) {
                 printf("close chat_server.\n");
-                close(pd);
+                close(pdw);
                 kill(pid, SIGQUIT);
                 break;
               }
@@ -73,12 +73,12 @@ int main (int argc, char * argv[]) {
                     perror("mkfifo");
                     exit(1);
               }
-              if ((pd = open ("./client_write", O_RDONLY)) == -1) { // 서버에서 생성한 FIFO 열기
+              if ((pdr = open ("./client_write", O_RDONLY)) == -1) { // 서버에서 생성한 FIFO 열기
                     perror("open");
                     exit(1);
               }
 
-              while ((n = read(pd, inmsg, MAXLINE)) > 0) {
+              while ((n = read(pdr, inmsg, MAXLINE)) > 0) {
                     write(1, inmsg, n);
                     if(strstr (inmsg, "<GET>") != NULL){ // <GET> 검사
                           //printf("<GET> 감지\n"); // test
@@ -90,12 +90,11 @@ int main (int argc, char * argv[]) {
                           bool flag = false;
                           while (p != NULL){
                                 //puts(p);
-                                i++;
+                                //i++;
                                 p = strtok(NULL, " ");
                                 if(flag == true) {
                                       strcpy(sArr, p);
                                       printf("데이터 요청: %s\n", sArr);
-
 
                                       flag = false;
 
