@@ -33,11 +33,15 @@ bool error_flag = false; // <err> 메시지 전송
 char send_text[MAXLINE]; // 전송할 파일 내용
 char filename[MAXLINE]; // 추출한 파일 제목 저장
 
+char *token = NULL; // 스트링 토큰 리드 변수
+char *sArr= {NULL,}; // 스트링 토큰화 순환 변수
+char f_name[MAXLINE] = "./"; // 경로 + 추출한 파일 이름 저장용 변수
+
 int main (int argc, char * argv[]) {
       int pdw, pdr, n; // 파이프 디스크립터, 문자열 디스크립터
       char inmsg[MAXLINE]; // 받는 메시지
       char sendline[MAXLINE], line[MAXLINE]; //보낼 메시지
-
+      //char buffer[MAXLINE];
       pid_t pid; // pid 저장
       int size; // 메시지 사이즈
 
@@ -77,6 +81,7 @@ int main (int argc, char * argv[]) {
                   // *** ready_flag = true 인 경우 바로 <RDY> 전송 (파일 전송절차 실행)
                   if(ready_flag == true) {
                         sleep(1); // 잠깐 쉬고
+
                         n = write(pdw, ready, strlen(ready)+1); // <RDY> 메시지 전송
                         // 메시지 전송 n 오류 처리
                         if (n == -1) {
@@ -152,10 +157,45 @@ int main (int argc, char * argv[]) {
             while(1) {
                   // 메시지 읽어오기
                   n = (read(pdr, inmsg, MAXLINE) > 0);
+                  text_check(n);s
                   // 터미널에 메시지 출력
                   write(1, inmsg, n);
 
                   // <GET> 감지
+                  if( strstr(inmsg, "<GET>") != NULL) {
+                        printf("<GET> 입력 감지");      // 검사용
+
+                        // 저장용 변수 초기화
+                        sArr = {NULL};
+                        f_name = "./";
+
+                        // 토큰화, 이름 추출
+                        token =strtok(inmsg, " "); // 공백 기준으로 parsing
+
+                        while( toekn != NULL) {
+                              token = strtok(NULL, " ");
+                        }
+
+                        // 마지막 토큰 (파일 이름) 가져오기
+                        printf("%s", token);
+                        // 추출 확인
+                        strcat(f_name, token);
+                        printf("%s", f_name);
+
+                        // 파일열기, 내용추출
+                        FILE *fp;
+                        if(fopen(f_name, "r") == -1) {
+                              error_flag = true;
+                        } else {
+                              fgets(send_text, sizeof(send_text),fp); // 문자열 읽어서 저장
+                              printf("읽어온 내용 %s", send_text);
+                              ready_flag = true;
+                        }
+                        fclose(fp);
+
+
+
+                  }
             }// 반복문 종료
       } // 자식 스레드 종료
 
