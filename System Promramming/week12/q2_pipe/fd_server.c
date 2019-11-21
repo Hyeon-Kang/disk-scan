@@ -166,7 +166,7 @@ int main (int argc, char * argv[]) {
                         printf("<GET> 입력 감지");      // 검사용
 
                         // 저장용 변수 초기화
-                        sArr = {NULL};
+                        //sArr = {NULL};
                         f_name = "./";
 
                         // 토큰화, 이름 추출
@@ -177,10 +177,10 @@ int main (int argc, char * argv[]) {
                         }
 
                         // 마지막 토큰 (파일 이름) 가져오기
-                        printf("%s", token);
+                        printf("토큰 값 : %s", token);
                         // 추출 확인
                         strcat(f_name, token);
-                        printf("%s", f_name);
+                        printf("경로 + 토큰 : %s", f_name);
 
                         // 파일열기, 내용추출
                         FILE *fp;

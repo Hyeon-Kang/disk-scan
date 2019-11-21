@@ -57,25 +57,21 @@ int main (int argc, char * argv[]) {
       부모 스레드
 
       파이프 쓰기모드로 열기
-      error_flag = true인 경우 파일 없음 출력
-      ready_flag = true인 경우 추출한 이름과 경로 조합으로
-      파일 쓰기모드로 열고 준비
-      sleep(1);
-      send_text를 작성하고
-      디스크립터 닫기
       문자열 읽은거 전송
       종료 키워드 감시
       <GET> 키워드 감시
       <GET> 발견 시 파싱해서 파일 이름 추출
-
-
       진행
 
       자식 스레드
       파이프 읽기모드로 열기
-      받은 물자열 감시 <ERR> -> error_flag = true;
+      받은 물자열 감시 <ERR> -> 파일이 없습니다 출력
       받은 문자열 감시 <RDY> -> ready_flag = true; {
-          다음에 받은 메시지를 send_text에 저장
+            추출한 이름과 경로 조합으로
+            파일 쓰기모드로 열고 준비
+      sleep(1);
+      send_text를 작성하고
+      디스크립터 닫기
       }
 
 
@@ -101,19 +97,71 @@ int main (int argc, char * argv[]) {
 
             // 반복문 수행
             while(1) {
-                  if(error_flag == true) {
-                        printf("파일이 없습니다.");
-                        error_flag == false;
+                  // 터미널 입력 가져오기
+                  if(readline(0, sendline, MAXLINE) != 0) {
+                          // 입력할 메시지 사이즈 계산
+                          size = strlen(sendline);
+
+                          // 이름 추가 절차 (생략)
+
+                          // 종료 입력 감시 (커맨드 : exit\n)
+                          if(strcmp(sendline, escapechar, 4) == 0) {
+                                  printf("채팅 서버를 닫습니다.");
+                                  close(pdw); // 파이프 디스크립터 닫기
+                                  break; // 반복문 탈출
+                          }
+
+                          // 파이프에 작성 (본래 이름까지 병합하여 line이지만 테스트이므로 sendline 바로 전송)
+                          n = write(pdw, sendline, strlen(sendline)+1);
+                          text_check(n);
+                  } // 터미널 입력 가져오기 종료
+
+                  // 입력 값에서 <GET> 감시
+                  if( strstr(sendline, "<GET>") != NULL) {
+                        printf("<GET> 입력 감지");      // 검사용
+
+                        // 저장용 변수 초기화
+                        //sArr = {NULL};
+                        f_name = "./";
+
+                        // 토큰화, 이름 추출
+                        token =strtok(sendline, " "); // 공백 기준으로 parsing
+
+                        while( toekn != NULL) {
+                              token = strtok(NULL, " ");
+                        }
+
+                        // 마지막 토큰 (파일 이름) 가져오기
+                        printf("%s", token);
+                        // 추출 확인
+                        strcat(f_name, "1"); // ./ + "1" + 파일명 (클라이언트가 불러오는 파일과 차별화)
+                        strcat(f_name, "token");
+                        printf("경로+이름 검사 : %s", f_name);  // 경로+이름 검사
                   }
-                  if(ready_flag == true) {
-                        sleep(1);
-                        printf("파일 다운로드 준비");
-                  }
+
+
 
             } // end 반복문
 
 
       } else {
+              // <ERR> 메시지를 받아 error_flag가 활성화된 경우
+              if(error_flag == true) {
+                    printf("파일이 없습니다.");
+                    error_flag == false;
+              }
+              // <RDY> 메시지를 받아 ready_flag가 활성화된 경우
+              if(ready_flag == true) {
+                    sleep(1);
+                    printf("파일 다운로드 준비");
+
+                    //
+
+
+
+
+                    ready_flag = false;
+              }
 
 
       }
