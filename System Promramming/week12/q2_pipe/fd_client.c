@@ -36,6 +36,7 @@ char filename[MAXLINE]; // 추출한 파일 제목 저장
 char *token = NULL; // 스트링 토큰 리드 변수
 char *sArr= {NULL,}; // 스트링 토큰화 순환 변수
 char f_name[MAXLINE] = "./"; // 경로 + 추출한 파일 이름 저장용 변수
+bool running = true;
 
 int main (int argc, char * argv[]) {
   int pdw, pdr, n; // 파이프 디스크립터, 문자열 디스크립터
@@ -96,10 +97,15 @@ int main (int argc, char * argv[]) {
                           // 이름 추가 절차 (생략)
 
                           // 종료 입력 감시 (커맨드 : exit\n)
-                          if(strcmp(sendline, escapechar, 4) == 0) {
+                          if(strncmp(sendline, escapechar, 4) == 0) {
                                   printf("채팅 서버를 닫습니다.");
                                   close(pdw); // 파이프 디스크립터 닫기
+                                  running = false;
                                   break; // 반복문 탈출
+                          }
+                          
+                          if(running == false) {
+                                return 0;
                           }
 
                           // 파이프에 작성 (본래 이름까지 병합하여 line이지만 테스트이므로 sendline 바로 전송)
@@ -109,17 +115,17 @@ int main (int argc, char * argv[]) {
 
                   // 입력 값에서 <GET> 감시
                   if( strstr(sendline, "<GET>") != NULL) {
-                        printf("<GET> 입력 감지");      // 검사용
+                        write(1, "<GET> 입력 감지", strlen("<GET> 입력 감지"));      // 검사용
 
                         // 저장용 변수 초기화
                         //sArr = {NULL};
-                        f_name = "./";
+                        f_name[MAXLINE] = "./";
 
                         // 토큰화, 이름 추출
                         token =strtok(sendline, " "); // 공백 기준으로 parsing
 
                         // 토큰 돌리기
-                        while( toekn != NULL) {
+                        while( token != NULL) {
                               token = strtok(NULL, " ");
                         }
 
@@ -145,18 +151,18 @@ int main (int argc, char * argv[]) {
                     n = (read(pdr, inmsg, MAXLINE) > 0);
                     text_check(n);
                     // 터미널에 메시지 출력
-                    write(1, inmsg, n);
+                    write(1, inmsg, strlen(inmsg)); // n -> strlen(inmsg)
 
               }
 
               // <ERR>을 받으면 파일 없음 출력
               if( strstr(inmsg, "<ERR>") != NULL) {
-                    printf("파일이 존재하지 않습니다.");
+                    write(1,"파일이 존재하지 않습니다.", strlen("파일이 존재하지 않습니다."));
               }
 
               // <RDY>, 준비 메시지를 받는다면
               if( strstr(inmsg, "<RDY>") != NULL) {
-                    printf("파일 다운로드");
+                    write(1, "파일 다운로드", strlen("파일 다운로드"));
 
                     // 파일 디스크립터 생성
                     FILE *fp;

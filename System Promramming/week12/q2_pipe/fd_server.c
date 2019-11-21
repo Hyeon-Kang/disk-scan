@@ -36,6 +36,7 @@ char filename[MAXLINE]; // 추출한 파일 제목 저장
 char *token = NULL; // 스트링 토큰 리드 변수
 char *sArr= {NULL,}; // 스트링 토큰화 순환 변수
 char f_name[MAXLINE] = "./"; // 경로 + 추출한 파일 이름 저장용 변수
+bool running = true;
 
 int main (int argc, char * argv[]) {
       int pdw, pdr, n; // 파이프 디스크립터, 문자열 디스크립터
@@ -81,7 +82,7 @@ int main (int argc, char * argv[]) {
                   // 파일 전송절차 실행
                   // *** ready_flag = true 인 경우 바로 <RDY> 전송 (파일 전송절차 실행)
                   if(ready_flag == true) {
-                        sleep(1); // 잠깐 쉬고
+                        //sleep(1); // 잠깐 쉬고
 
                         n = write(pdw, ready, strlen(ready)+1); // <RDY> 메시지 전송
                         // 메시지 전송 n 오류 처리
@@ -92,7 +93,7 @@ int main (int argc, char * argv[]) {
                         // 이어서 send_text 전송 (EOF 포함 256자리 넘어가면 깨짐!!)
                         n = write(pdw, send_text, strlen(send_text)+1); // 읽어온 파일 내용 전송
                         text_check(n); // 파이프 작성 오류 검사
-                        sleep(1); // 잠깐 쉬기 (클라이언트 처리를 위한 여유 시간)
+                        //sleep(1); // 잠깐 쉬기 (클라이언트 처리를 위한 여유 시간)
                         n = write(pdw, eof, strlen(eof)+1); // <EOF> 메시지 전송
                         text_check(n);
                         ready_flag = false; //ready_flag = false;
@@ -106,10 +107,15 @@ int main (int argc, char * argv[]) {
                         // 이름 추가 절차 (생략)
 
                         // 종료 입력 감시 (커맨드 : exit\n)
-                        if(strcmp(sendline, escapechar, 4) == 0) {
+                        if(strncmp(sendline, escapechar, 4) == 0) {
                               printf("채팅 서버를 닫습니다.");
                               close(pdw); // 파이프 디스크립터 닫기
+                              running = false;
                               break; // 반복문 탈출
+                        }
+
+                        if(running == false) {
+                              return 0;
                         }
 
                         // 파이프에 작성 (본래 이름까지 병합하여 line이지만 테스트이므로 sendline 바로 전송)
@@ -148,19 +154,24 @@ int main (int argc, char * argv[]) {
                   exit(1);
             }
 
-            // 파이프 쓰기모드로 열기
-            if((pdw = open("./client_write", O_RDONLY)) == -1) {
+            // 파이프 읽모드로 열기
+            if((pdr = open("./client_write", O_RDONLY)) == -1) {
                   perror("pipe discriptor 열기 실패");
                   exit(1);
             }
 
             // 반복문 수행
             while(1) {
+
+                  if(running == false) {
+                        return 0;
+                  }
+
                   // 메시지 읽어오기
                   n = (read(pdr, inmsg, MAXLINE) > 0);
-                  text_check(n);s
+                  text_check(n);
                   // 터미널에 메시지 출력
-                  write(1, inmsg, n);
+                  write(1, inmsg, strlen(inmsg)); // n -> strlen(inmsg)
 
                   // <GET> 감지
                   if( strstr(inmsg, "<GET>") != NULL) {
@@ -168,12 +179,12 @@ int main (int argc, char * argv[]) {
 
                         // 저장용 변수 초기화
                         //sArr = {NULL};
-                        f_name = "./";
+                        f_name[MAXLINE] = "./";
 
                         // 토큰화, 이름 추출
                         token =strtok(inmsg, " "); // 공백 기준으로 parsing
 
-                        while( toekn != NULL) {
+                        while( token != NULL) {
                               token = strtok(NULL, " ");
                         }
 
@@ -193,9 +204,6 @@ int main (int argc, char * argv[]) {
                               ready_flag = true;
                         }
                         fclose(fp);
-
-
-
                   }
             }// 반복문 종료
       } // 자식 스레드 종료
