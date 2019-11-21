@@ -71,24 +71,15 @@ int main (int argc, char * argv[]) {
             파일 쓰기모드로 열고 준비
       sleep(1);
       send_text를 작성하고
+      <EOF> 받으면
       디스크립터 닫기
-      }
 
-
-
-      *
       터미널 내용에서 개행 입력시 끊어서 문자열 변수로 저장
       저장 변수
       해당 문자열 변수 전송*/
 
       if( (pid = fork()) > 0) {
-
-            // 파이프 생성
-            if(mkfifo("./client_write", 0666) == -1) {
-                  perror("fifo 생성 오류");
-                  exit(1);
-            }
-
+            // 서버측에서 파이프 다 만들어놓음
             // 파이프 쓰기모드로 열기
             if((pdw = open("./client_write", O_WRONLY)) == -1) {
                   perror("pipe discriptor 열기 실패");
@@ -127,6 +118,7 @@ int main (int argc, char * argv[]) {
                         // 토큰화, 이름 추출
                         token =strtok(sendline, " "); // 공백 기준으로 parsing
 
+                        // 토큰 돌리기
                         while( toekn != NULL) {
                               token = strtok(NULL, " ");
                         }
@@ -137,41 +129,60 @@ int main (int argc, char * argv[]) {
                         strcat(f_name, "1"); // ./ + "1" + 파일명 (클라이언트가 불러오는 파일과 차별화)
                         strcat(f_name, "token");
                         printf("경로+이름 검사 : %s", f_name);  // 경로+이름 검사
-                  }
-
-
+                  } // end <GET> 감시
 
             } // end 반복문
 
-
-      } else {
-              // <ERR> 메시지를 받아 error_flag가 활성화된 경우
-              if(error_flag == true) {
-                    printf("파일이 없습니다.");
-                    error_flag == false;
-              }
-              // <RDY> 메시지를 받아 ready_flag가 활성화된 경우
-              if(ready_flag == true) {
-                    sleep(1);
-                    printf("파일 다운로드 준비");
-
-                    //
-
-
-
-
-                    ready_flag = false;
+      } else { // 자식 스레드 (읽기모드)
+              // server_write 파이프 읽기모드로 열기
+              if( (pdr = open("./server_write", O_RDONLY)) == -1) {
+                    perror("파이프 열기 실패");
               }
 
+              // 반복문 수행
+              while(1) {
+                    // 메시지 읽어오기
+                    n = (read(pdr, inmsg, MAXLINE) > 0);
+                    text_check(n);
+                    // 터미널에 메시지 출력
+                    write(1, inmsg, n);
 
-      }
+              }
 
+              // <ERR>을 받으면 파일 없음 출력
+              if( strstr(inmsg, "<ERR>") != NULL) {
+                    printf("파일이 존재하지 않습니다.");
+              }
 
+              // <RDY>, 준비 메시지를 받는다면
+              if( strstr(inmsg, "<RDY>") != NULL) {
+                    printf("파일 다운로드");
 
+                    // 파일 디스크립터 생성
+                    FILE *fp;
+                    if(fp = fopen(f_name, "w") == -1) {
+                          n = (read(pdr, inmsg, MAXLINE) > 0);
+                          text_check(n);
 
+                          // 받은 내용 쓰기
+                          fputs(inmsg, fp);
 
+                          // 디스크립터 닫기
+                          fclose(fp);
+                    } // end 파일 쓰기
+              } // <RDY> 처리 종료
+      } // end else
+} // end main
 
+  // 파이프에 메시지 작성이 정상적으로 됬는지 검사하는 함수
+  void text_check(int n) {
+        if (n == -1) {
+              perror("write message 오류");
+              exit(1);
+        }
+  }
 
+  // 한 줄씩 읽어오는 함수
   int readline(int fd, char *ptr, int maxlen) {
         int n, rc;
         char c;

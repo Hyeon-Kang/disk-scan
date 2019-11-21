@@ -45,10 +45,11 @@ int main (int argc, char * argv[]) {
       pid_t pid; // pid 저장
       int size; // 메시지 사이즈
 
+      char *Error = "<ERR>"; // 오류 전달
       char *ready = "<RDY>"; // 전송 준비완료 알림 메시지
       char *eof = "<EOF>"; // 전송 종료 알림 메시지
 
-      char *err = "파일이 존재하지 않습니다.";
+      //char *err = "파일이 존재하지 않습니다.";
       char *escapechar = "exit\n";	/* 종료문자 */
 
       //부모 스레드 (server_write 파이프에 쓰기)
@@ -73,7 +74,7 @@ int main (int argc, char * argv[]) {
 
                   // 파일이 존재하지 않는 경우
                   if(error_flag == true) {
-                          n = write(pdw, err, strlen(err)+1); // err 메시지 전송
+                          n = write(pdw, Error, strlen(Error)+1); // err 메시지 전송
                           error_flag = false;
                   }
 
