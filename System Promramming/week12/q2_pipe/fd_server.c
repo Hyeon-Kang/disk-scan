@@ -39,199 +39,199 @@ char f_name[MAXLINE] = "./"; // 경로 + 추출한 파일 이름 저장용 변�
 bool running = true;
 
 int main (int argc, char * argv[]) {
-      int pdw, pdr, n; // 파이프 디스크립터, 문자열 디스크립터
-      char inmsg[MAXLINE]; // 받는 메시지
-      char sendline[MAXLINE], line[MAXLINE]; //보낼 메시지
-      //char buffer[MAXLINE];
-      pid_t pid; // pid 저장
-      int size; // 메시지 사이즈
+    int pdw, pdr, n; // 파이프 디스크립터, 문자열 디스크립터
+    char inmsg[MAXLINE]; // 받는 메시지
+    char sendline[MAXLINE], line[MAXLINE]; //보낼 메시지
+    //char buffer[MAXLINE];
+    pid_t pid; // pid 저장
+    int size; // 메시지 사이즈
 
-      char *Error = "<ERR>"; // 오류 전달
-      char *ready = "<RDY>"; // 전송 준비완료 알림 메시지
-      char *eof = "<EOF>"; // 전송 종료 알림 메시지
+    char *Error = "<ERR>"; // 오류 전달
+    char *ready = "<RDY>"; // 전송 준비완료 알림 메시지
+    char *eof = "<EOF>"; // 전송 종료 알림 메시지
 
-      //char *err = "파일이 존재하지 않습니다.";
-      char *escapechar = "exit\n";	/* 종료문자 */
+    //char *err = "파일이 존재하지 않습니다.";
+    char *escapechar = "exit\n";	/* 종료문자 */
 
-      //부모 스레드 (server_write 파이프에 쓰기)
-      if( (pid = fork()) > 0) {
+    //부모 스레드 (server_write 파이프에 쓰기)
+    if( (pid = fork()) > 0) {
 
-            // 파이프 생성
-            if(mkfifo("./server_write", 0666) == -1) {
-                  perror("fifo 생성 오류");
-                  exit(1);
+        // 파이프 생성
+        if(mkfifo("./server_write", 0666) == -1) {
+            perror("fifo 생성 오류");
+            exit(1);
+        }
+
+        // 파이프 쓰기모드로 열기
+        if((pdw = open("./server_write", O_WRONLY)) == -1) {
+            perror("pipe discriptor 열기 실패");
+            exit(1);
+        }
+
+        // 반복문 수행
+        while(1) {
+            // 자식을 통해 파이프로 받은 메시지가 errror_true 인 경우 error_flag = true;
+            // 자식을 통해 파이프로 받은 메시지가 ready_true 인 경우 ready_flag = true;
+
+            // 파일이 존재하지 않는 경우
+            if(error_flag == true) {
+                n = write(pdw, Error, strlen(Error)+1); // err 메시지 전송
+                error_flag = false;
             }
 
-            // 파이프 쓰기모드로 열기
-            if((pdw = open("./server_write", O_WRONLY)) == -1) {
-                  perror("pipe discriptor 열기 실패");
-                  exit(1);
+            // 파일 전송절차 실행
+            // *** ready_flag = true 인 경우 바로 <RDY> 전송 (파일 전송절차 실행)
+            if(ready_flag == true) {
+                //sleep(1); // 잠깐 쉬고
+
+                n = write(pdw, ready, strlen(ready)+1); // <RDY> 메시지 전송
+                // 메시지 전송 n 오류 처리
+                if (n == -1) {
+                    perror("write message 오류");
+                    exit(1);
+                }
+                // 이어서 send_text 전송 (EOF 포함 256자리 넘어가면 깨짐!!)
+                n = write(pdw, send_text, strlen(send_text)+1); // 읽어온 파일 내용 전송
+                text_check(n); // 파이프 작성 오류 검사
+                //sleep(1); // 잠깐 쉬기 (클라이언트 처리를 위한 여유 시간)
+                n = write(pdw, eof, strlen(eof)+1); // <EOF> 메시지 전송
+                text_check(n);
+                ready_flag = false; //ready_flag = false;
+            } // 파일 전송절차 종료
+
+            // 터미널 입력 가져오기
+            if(readline(0, sendline, MAXLINE) != 0) {
+                // 입력할 메시지 사이즈 계산
+                size = strlen(sendline);
+
+                // 이름 추가 절차 (생략)
+
+                // 종료 입력 감시 (커맨드 : exit\n)
+                if(strncmp(sendline, escapechar, 4) == 0) {
+                    printf("채팅 서버를 닫습니다.");
+                    close(pdw); // 파이프 디스크립터 닫기
+                    running = false;
+                    break; // 반복문 탈출
+                }
+
+                if(running == false) {
+                    return 0;
+                }
+
+                // 파이프에 작성 (본래 이름까지 병합하여 line이지만 테스트이므로 sendline 바로 전송)
+                n = write(pdw, sendline, strlen(sendline)+1);
+                text_check(n);
+
+            } // 터미널 입력 가져오기 종료
+        } // end while
+
+        // 자식스레드 종료 기다리기 추가해야 하나???
+
+    } // 부모 스레드 종료
+    else { // client_write에서 메시지를 읽어올 자식스레드
+        /* 절차 설명
+        서버 프로그램이므로 파이프 생성 및 열기
+        메시지를 읽어온다.
+        <GET>이 감지가 되면
+        사용할 저장 변수 filename과 send_text를 NULL로 초기화 한다.
+        파싱을 해서 파일 이름을 추출하여 filename에 저장한다.
+        추출한 파일 이름이 있다면 (fopen, "r" != -1)
+        파일을 열고 내용을 send_text 변수에 저장하고
+        파일 디스크립터를 닫고
+        ready_flag를 true로 바꾼다. -> (내부 파이프를 통해 부모에게 ready_true 전달) -> 공유 자원으로 해결
+        // ** 해보고 씹히는거 같으면 2번 보내자
+        내부 파이프로 메시지를 보낸 뒤에는 아무 문자나 보내서 파이프 메시지 초기화
+
+        만약 -1로 존재하지 않는 경우
+        아무것도 건드리지 않고
+        error_flag를 true로 한다. -> 내부 파이프를 통해 부모에게 error_true 전달 -> 공유 자원으로 해결
+        내부 파이프로 메시지를 보낸 뒤에는 아무 문자나 보내서 파이프 메시지 초기화
+        */
+
+        // 파이프 생성
+        if(mkfifo("./client_write", 0666) == -1) {
+            perror("fifo 생성 오류");
+            exit(1);
+        }
+
+        // 파이프 읽모드로 열기
+        if((pdr = open("./client_write", O_RDONLY)) == -1) {
+            perror("pipe discriptor 열기 실패");
+            exit(1);
+        }
+
+        // 반복문 수행
+        while(1) {
+
+            if(running == false) {
+                return 0;
             }
 
-            // 반복문 수행
-            while(1) {
-                  // 자식을 통해 파이프로 받은 메시지가 errror_true 인 경우 error_flag = true;
-                  // 자식을 통해 파이프로 받은 메시지가 ready_true 인 경우 ready_flag = true;
+            // 메시지 읽어오기
+            n = (read(pdr, inmsg, MAXLINE) > 0);
+            text_check(n);
+            // 터미널에 메시지 출력
+            write(1, inmsg, strlen(inmsg)); // n -> strlen(inmsg)
 
-                  // 파일이 존재하지 않는 경우
-                  if(error_flag == true) {
-                          n = write(pdw, Error, strlen(Error)+1); // err 메시지 전송
-                          error_flag = false;
-                  }
+            // <GET> 감지
+            if( strstr(inmsg, "<GET>") != NULL) {
+                printf("<GET> 입력 감지");      // 검사용
 
-                  // 파일 전송절차 실행
-                  // *** ready_flag = true 인 경우 바로 <RDY> 전송 (파일 전송절차 실행)
-                  if(ready_flag == true) {
-                        //sleep(1); // 잠깐 쉬고
+                // 저장용 변수 초기화
+                //sArr = {NULL};
+                f_name[MAXLINE] = "./";
 
-                        n = write(pdw, ready, strlen(ready)+1); // <RDY> 메시지 전송
-                        // 메시지 전송 n 오류 처리
-                        if (n == -1) {
-                              perror("write message 오류");
-                              exit(1);
-                        }
-                        // 이어서 send_text 전송 (EOF 포함 256자리 넘어가면 깨짐!!)
-                        n = write(pdw, send_text, strlen(send_text)+1); // 읽어온 파일 내용 전송
-                        text_check(n); // 파이프 작성 오류 검사
-                        //sleep(1); // 잠깐 쉬기 (클라이언트 처리를 위한 여유 시간)
-                        n = write(pdw, eof, strlen(eof)+1); // <EOF> 메시지 전송
-                        text_check(n);
-                        ready_flag = false; //ready_flag = false;
-                  } // 파일 전송절차 종료
+                // 토큰화, 이름 추출
+                token =strtok(inmsg, " "); // 공백 기준으로 parsing
 
-                  // 터미널 입력 가져오기
-                  if(readline(0, sendline, MAXLINE) != 0) {
-                        // 입력할 메시지 사이즈 계산
-                        size = strlen(sendline);
+                while( token != NULL) {
+                    token = strtok(NULL, " ");
+                }
 
-                        // 이름 추가 절차 (생략)
+                // 마지막 토큰 (파일 이름) 가져오기
+                printf("토큰 값 : %s", token);
+                // 추출 확인
+                strcat(f_name, token);
+                printf("경로 + 토큰 : %s", f_name);
 
-                        // 종료 입력 감시 (커맨드 : exit\n)
-                        if(strncmp(sendline, escapechar, 4) == 0) {
-                              printf("채팅 서버를 닫습니다.");
-                              close(pdw); // 파이프 디스크립터 닫기
-                              running = false;
-                              break; // 반복문 탈출
-                        }
-
-                        if(running == false) {
-                              return 0;
-                        }
-
-                        // 파이프에 작성 (본래 이름까지 병합하여 line이지만 테스트이므로 sendline 바로 전송)
-                        n = write(pdw, sendline, strlen(sendline)+1);
-                        text_check(n);
-
-                  } // 터미널 입력 가져오기 종료
-            } // end while
-
-            // 자식스레드 종료 기다리기 추가해야 하나???
-
-      } // 부모 스레드 종료
-      else { // client_write에서 메시지를 읽어올 자식스레드
-            /* 절차 설명
-            서버 프로그램이므로 파이프 생성 및 열기
-            메시지를 읽어온다.
-            <GET>이 감지가 되면
-            사용할 저장 변수 filename과 send_text를 NULL로 초기화 한다.
-            파싱을 해서 파일 이름을 추출하여 filename에 저장한다.
-            추출한 파일 이름이 있다면 (fopen, "r" != -1)
-            파일을 열고 내용을 send_text 변수에 저장하고
-            파일 디스크립터를 닫고
-            ready_flag를 true로 바꾼다. -> (내부 파이프를 통해 부모에게 ready_true 전달) -> 공유 자원으로 해결
-            // ** 해보고 씹히는거 같으면 2번 보내자
-            내부 파이프로 메시지를 보낸 뒤에는 아무 문자나 보내서 파이프 메시지 초기화
-
-            만약 -1로 존재하지 않는 경우
-            아무것도 건드리지 않고
-            error_flag를 true로 한다. -> 내부 파이프를 통해 부모에게 error_true 전달 -> 공유 자원으로 해결
-            내부 파이프로 메시지를 보낸 뒤에는 아무 문자나 보내서 파이프 메시지 초기화
-             */
-
-            // 파이프 생성
-            if(mkfifo("./client_write", 0666) == -1) {
-                  perror("fifo 생성 오류");
-                  exit(1);
+                // 파일열기, 내용추출
+                FILE *fp;
+                if(fopen(f_name, "r") == -1) {
+                    error_flag = true;
+                } else {
+                    fgets(send_text, sizeof(send_text),fp); // 문자열 읽어서 저장
+                    printf("읽어온 내용 %s", send_text);
+                    ready_flag = true;
+                }
+                fclose(fp);
             }
+        }// 반복문 종료
+    } // 자식 스레드 종료
 
-            // 파이프 읽모드로 열기
-            if((pdr = open("./client_write", O_RDONLY)) == -1) {
-                  perror("pipe discriptor 열기 실패");
-                  exit(1);
-            }
-
-            // 반복문 수행
-            while(1) {
-
-                  if(running == false) {
-                        return 0;
-                  }
-
-                  // 메시지 읽어오기
-                  n = (read(pdr, inmsg, MAXLINE) > 0);
-                  text_check(n);
-                  // 터미널에 메시지 출력
-                  write(1, inmsg, strlen(inmsg)); // n -> strlen(inmsg)
-
-                  // <GET> 감지
-                  if( strstr(inmsg, "<GET>") != NULL) {
-                        printf("<GET> 입력 감지");      // 검사용
-
-                        // 저장용 변수 초기화
-                        //sArr = {NULL};
-                        f_name[MAXLINE] = "./";
-
-                        // 토큰화, 이름 추출
-                        token =strtok(inmsg, " "); // 공백 기준으로 parsing
-
-                        while( token != NULL) {
-                              token = strtok(NULL, " ");
-                        }
-
-                        // 마지막 토큰 (파일 이름) 가져오기
-                        printf("토큰 값 : %s", token);
-                        // 추출 확인
-                        strcat(f_name, token);
-                        printf("경로 + 토큰 : %s", f_name);
-
-                        // 파일열기, 내용추출
-                        FILE *fp;
-                        if(fopen(f_name, "r") == -1) {
-                              error_flag = true;
-                        } else {
-                              fgets(send_text, sizeof(send_text),fp); // 문자열 읽어서 저장
-                              printf("읽어온 내용 %s", send_text);
-                              ready_flag = true;
-                        }
-                        fclose(fp);
-                  }
-            }// 반복문 종료
-      } // 자식 스레드 종료
-
-      return 0;
+    return 0;
 } // end main
 
-  // 파이프에 메시지 작성이 정상적으로 됬는지 검사하는 함수
-  void text_check(int n) {
-        if (n == -1) {
-              perror("write message 오류");
-              exit(1);
-        }
-  }
+// 파이프에 메시지 작성이 정상적으로 됬는지 검사하는 함수
+void text_check(int n) {
+    if (n == -1) {
+        perror("write message 오류");
+        exit(1);
+    }
+}
 
-  // 한 줄씩 읽어오는 함수
-  int readline(int fd, char *ptr, int maxlen) {
-        int n, rc;
-        char c;
-        for(n = 1; n < maxlen; n++) {
-              if((rc = read(fd, &c, 1)) == 1) {
-                    *ptr++ = c;
-                    if (c == '\n') break;
-              } else if (rc == 0) {
-                    if(n == 1) return (0);
-                else break;
-              }
+// 한 줄씩 읽어오는 함수
+int readline(int fd, char *ptr, int maxlen) {
+    int n, rc;
+    char c;
+    for(n = 1; n < maxlen; n++) {
+        if((rc = read(fd, &c, 1)) == 1) {
+            *ptr++ = c;
+            if (c == '\n') break;
+        } else if (rc == 0) {
+            if(n == 1) return (0);
+            else break;
         }
-        *ptr = 0;
-        return (n);
-  }
+    }
+    *ptr = 0;
+    return (n);
+}
