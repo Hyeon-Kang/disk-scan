@@ -2,6 +2,23 @@
 #include <winbase.h>
 #include <stdio.h>
 
+/* 구현 방법
+1. 디스크 루트로 이동하여 파일리스트 보여주기
+2. 지정 파일 삭제 {
+    파일 이름, 사이즈를 외부에 임시저장 *** 파일의 오프셋 위치를 미리 알 수 없을까?? 혼자면 몰라도 여러 파일이면 좀....
+    ** 파일 사이즈 얻기 GetFileSize https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfilesize
+    파일 삭제
+}
+링크 : 파일의 사이즈 구하기 https://m.blog.naver.com/PostView.nhn?blogId=iloveembla&logNo=220963358032&proxyReferer=https%3A%2F%2Fwww.google.com%2F
+2. */
+
+
+//
+// FILE_ZERO_DATA_INFORMATION https://docs.microsoft.com/en-us/windows/win32/api/winioctl/ns-winioctl-file_zero_data_information
+// 윈도우 파일 관리 구조 https://docs.microsoft.com/en-us/windows/win32/fileio/file-management-structures
+// GetFileInformationByHandleEx 함수
+// 혹시모름 https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getfileinformationbyhandleex?redirectedfrom=MSDN
+
 // INTMAX = intmax 값
 
 //#include ST32 NULL    // 4GB 이하
@@ -80,7 +97,7 @@ int main(int argc, char ** argv)
         // }
 
         // 저장장치 용량을 가져와 반복횟수 구현하기
-        for(int i=0; i<10000; i++) {
+        for(int i=0; i<1000; i++) {
               // sprintf(buf, "%d", sector[i]);
               // if(buf != 0) {
               //       cnt++;
