@@ -24,4 +24,18 @@ int main (void) {
         perror("ftruncate");
         exit(1);
     }
+
+    addr = mmap(NULL, length, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t)0);
+    // 파일 크기가 > 0 이 되므로 메모리 매핑함수 mmap 호출 가능
+
+    if(addr == MAP_FAILED) {
+        perror("mmap");
+        exit(1);
+    }
+
+    close(fd);
+
+    strcpy(addr, "ftruncate Test\n"); // 매핑한 메모리에 데이터 쓰기 -> 파일에 데이터 쓰기
+
+    return 0;
 }
