@@ -41,7 +41,6 @@ int main(int argc, char* argv[])
             //printf("====== 부모 스레드 ======\n");
             //printf("부모 스레드 %d 번 값에접근\n", random);
             //printf("%d 번 값 : %c\n", random, board[random]);
-
             if(board[random] == 'p'){
                 //printf("변경하지 않음\n");
             } else {
@@ -56,8 +55,6 @@ int main(int argc, char* argv[])
 
         // 게임 결과 확인
         printf("결과 : %s\n", board);
-
-        sleep(1);
         // 결과 파일 작성
         FILE *fp = fopen("./result.txt", "w");
         fwrite(board, strlen(board), 1, fp);
