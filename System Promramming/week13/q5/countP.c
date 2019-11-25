@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
         printf("Parent won!\n");
         printf("parent : %d\n", cnt_p);
     }else if( cnt_p == cnt_c ) {
-        printf("Even!\n")
+        printf("Even!\n");
     } else {
         printf("Child won!\n");
         printf("child : %d\n", cnt_c);
