@@ -4,7 +4,7 @@
 #include <time.h>
 #include <string.h>
 
-int main(int argc, char* argvp[]) {
+int main(int argc, char* argv[]) {
     char board[255] = {NULL,}; // 게임 판 저장
     int cnt_c, cnt_p = 0; // 카운트 변수
 
@@ -38,10 +38,12 @@ int main(int argc, char* argvp[]) {
 
     if(cnt_p > cnt_c) {
         printf("Parent won!\n");
+        printf("parent : %d\n", cnt_p);
     }else if( cnt_p == cnt_c ) {
         printf("Even!\n")
     } else {
         printf("Child won!\n");
+        printf("child : %d\n", cnt_c);
     }
 
 }
