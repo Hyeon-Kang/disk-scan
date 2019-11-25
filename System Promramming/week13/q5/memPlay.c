@@ -9,7 +9,7 @@ char board[255] = {NULL,}; // 게임 판 저장 (공용자원)
 
 int main(int argc, char* argv[])
 {
-    srand(time(NULL));
+    //srand(time(NULL));
 
     // 필요 변수 선언
     int cnt_p, cnt_c = 0; // p, c 카운트 변수
@@ -35,23 +35,26 @@ int main(int argc, char* argv[])
     }
 
     if((pid = fork()) > 0) { // 부모 프로세스
+        srand(time(NULL));
         for(int i =0; i<100; i++) {
-            int random = rand() % 101; // 1~100 범위의 랜덤 값 생성
-            printf("====== 부모 스레드 ======\n");
-            printf("부모 스레드 %d 번 값에접근\n", random);
-            printf("%d 번 값 : %c\n", random, board[random]);
+            int random = rand() % 100; // 1~100 범위의 랜덤 값 생성
+            //printf("====== 부모 스레드 ======\n");
+            //printf("부모 스레드 %d 번 값에접근\n", random);
+            //printf("%d 번 값 : %c\n", random, board[random]);
 
             if(board[random] == 'p'){
-                printf("변경하지 않음\n");
+                //printf("변경하지 않음\n");
             } else {
-                printf("변경\n");
+                //printf("변경\n");
                 board[random] = 'p';
             }
-            printf("\n\n");
+            //printf("\n\n");
             sleep(1);
         } // end for
 
         sleep(1);
+
+        // 게임 결과 확인
         printf("결과 : %s\n", board);
 
         sleep(1);
@@ -63,19 +66,20 @@ int main(int argc, char* argv[])
 
     } else if(pid == 0) {
         for(int i=0; i<100; i++) {
-            int random = rand() % 101; // 1~100 범위의 랜덤 값 생성
-            printf("====== 자식 스레드 ======\n");
-            printf("자식 스레드 %d 번 값에접근\n", random);
-            printf("%d 번 값 : %c\n", random, board[random]);
+            sleep(1);
+            int random = rand() % 100; // 1~100 범위의 랜덤 값 생성
+            //printf("====== 자식 스레드 ======\n");
+            //printf("자식 스레드 %d 번 값에접근\n", random);
+            //printf("%d 번 값 : %c\n", random, board[random]);
 
             if(board[random] == 'c'){
-                printf("변경하지 않음\n");
+                //printf("변경하지 않음\n");
             } else {
-                printf("변경\n");
+                //printf("변경\n");
                 board[random] = 'c';
             }
-            printf("\n\n");
-            sleep(1);
+            //printf("\n\n");
+            //sleep(1);
         } // end for
     }
     // return 0;
