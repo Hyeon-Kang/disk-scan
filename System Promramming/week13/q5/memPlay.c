@@ -5,7 +5,7 @@
 #include <string.h>
 
 int check = 0;
-char board[255] = {NULL,}; // 게임 판 저장 (공용자원)
+char board[255]; // 게임 판 저장 (공용자원)
 
 int main(int argc, char* argv[])
 {
