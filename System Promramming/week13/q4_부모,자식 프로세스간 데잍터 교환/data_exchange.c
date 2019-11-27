@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
             exit(1);
             break;
 
-        43 case 0 : /* child process */
+        case 0 : /* child process */
             printf("1. Child Process : addr=%s", addr);
             sleep(1);
             addr[0] = 'x'; // 자식 프로세스가 매핑된 내용 수정
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
             printf("1. Parent process : addr=%s", addr); // 매핑된 내용 읽기
             sleep(2);
             printf("2. Parent process : addr=%s", addr);
-            addr[1] = ＇y＇; // 부모 프로세스가 매핑된 내용 수정
+            addr[1] = 'y'; // 부모 프로세스가 매핑된 내용 수정
             printf("3. Parent process : addr=%s", addr);
             break;
     }

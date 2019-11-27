@@ -37,7 +37,7 @@ int main(int argc, char * argv[]) {
     printf("%s", addr); // 매핑된 내용 출력
 
     printf("----------\n");
-    addr[0] = 'D': // 매핑된 내용 수정
+    addr[0] = 'D'; // 매핑된 내용 수정
     printf("%s", addr);
 
     // 메모리 동기화 함수!
