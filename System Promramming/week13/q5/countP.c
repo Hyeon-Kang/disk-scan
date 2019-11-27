@@ -5,7 +5,7 @@
 #include <string.h>
 
 int main(int argc, char* argv[]) {
-    char board[255] = {NULL,}; // 게임 판 저장
+    char board[255];// 게임 판 저장
     int cnt_c, cnt_p = 0; // 카운트 변수
 
     char path[] = "./";
