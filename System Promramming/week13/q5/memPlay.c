@@ -63,7 +63,6 @@ int main(int argc, char* argv[])
 
     } else if(pid == 0) {
         for(int i=0; i<100; i++) {
-            sleep(1);
             int random = rand() % 100; // 1~100 범위의 랜덤 값 생성
             //printf("====== 자식 스레드 ======\n");
             printf("자식 스레드 %d 번 값에접근\n", random);
@@ -76,7 +75,7 @@ int main(int argc, char* argv[])
                 board[random] = 'c';
             }
             //printf("\n\n");
-            //sleep(1);
+            sleep(1);
         } // end for
     }
     // return 0;
