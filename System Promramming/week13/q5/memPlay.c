@@ -39,12 +39,12 @@ int main(int argc, char* argv[])
         for(int i =0; i<100; i++) {
             int random = rand() % 100; // 1~100 범위의 랜덤 값 생성
             //printf("====== 부모 스레드 ======\n");
-            //printf("부모 스레드 %d 번 값에접근\n", random);
+            printf("부모 스레드 %d 번 값에접근\n", random);
             //printf("%d 번 값 : %c\n", random, board[random]);
             if(board[random] == 'p'){
                 //printf("변경하지 않음\n");
             } else {
-                //printf("변경\n");
+                printf("부모 스레드가 %d 번 값 변경\n", random);
                 board[random] = 'p';
             }
             //printf("\n\n");
@@ -66,13 +66,13 @@ int main(int argc, char* argv[])
             sleep(1);
             int random = rand() % 100; // 1~100 범위의 랜덤 값 생성
             //printf("====== 자식 스레드 ======\n");
-            //printf("자식 스레드 %d 번 값에접근\n", random);
+            printf("자식 스레드 %d 번 값에접근\n", random);
             //printf("%d 번 값 : %c\n", random, board[random]);
 
             if(board[random] == 'c'){
                 //printf("변경하지 않음\n");
             } else {
-                //printf("변경\n");
+                printf("자식 스레드가 %d 번 값 변경\n", random);
                 board[random] = 'c';
             }
             //printf("\n\n");
