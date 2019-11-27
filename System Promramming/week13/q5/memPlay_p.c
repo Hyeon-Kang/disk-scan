@@ -17,6 +17,29 @@ int main(int argc, char* argv[])
     strcat(path, argv[1]);
 
     if((pid = fork()) > 0) { // 부모 프로세스
+
+        // 게임판에서 c 찾아서 변환
+        for(int j=0; j<100; j++) {
+            FILE *pFile = NULL;
+            pFile = fopen( path, "r" );
+
+            if( pFile != NULL )
+            {
+                fgets( board, sizeof(board), pFile ); // board에 게임판 저장
+            }
+            fclose( pFile );
+
+            int random_p = rand() % 100; // 1~100 범위의 랜덤 값 생성
+            FILE *fp = fopen(path, "r+");    // 파일을 읽기/쓰기 모드로 열기.
+            fseek(fp, random_p, SEEK_SET);
+            printf("부모 스레드 %d 번 값에접근\n", random_p);
+            fwrite(pp, strlen(pp), 1, fp);
+            rewind(fp);
+            fclose(fp);
+            
+            sleep(1);
+        } // end for
+    } else if(pid == 0) {
         for(int i =0; i<100; i++) {
             FILE *pFile = NULL;
             pFile = fopen( path, "r" );
@@ -29,29 +52,17 @@ int main(int argc, char* argv[])
 
             // 게임판에서 c 찾아서 변환
             for(int j =0; j<100; j++) {
-                if(board[j] == 'c') {
+                if(board[j] == 'p') {
                     // 게임판 열기
                     FILE *fp = fopen(path, "r+");    // 파일을 읽기/쓰기 모드로 열기.
                     fseek(fp, j, SEEK_SET);
-                    printf("부모 스레드 %d 번 값에접근\n", j);
-                    fwrite(pp, strlen(pp), 1, fp);
+                    printf("자식 스레드 %d 번 값에접근\n", j);
+                    fwrite(cc, strlen(cc), 1, fp);
                     rewind(fp);
                     fclose(fp);
                     break;
                 }
             }
-            sleep(1);
-        } // end for
-    } else if(pid == 0) {
-        for(int j=0; j<100; j++) {
-            int random_c = rand() % 100; // 1~100 범위의 랜덤 값 생성
-            FILE *fp = fopen(path, "r+");    // 파일을 읽기/쓰기 모드로 열기.
-            fseek(fp, random_c, SEEK_SET);
-            printf("자식 스레드 %d 번 값에접근\n", random_c);
-            fwrite(cc, strlen(cc), 1, fp);
-            rewind(fp);
-            fclose(fp);
-
             sleep(1);
         } // end for
 

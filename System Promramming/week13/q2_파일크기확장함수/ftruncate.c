@@ -11,7 +11,7 @@ int main (void) {
     int fd, pagesize, length;
     caddr_t addr;
 
-    pagesize = sysconf(_sc_PAGESIZE); // 메모리의 [페이지 크기] 정보 검색
+    pagesize = sysconf(_SC_PAGESIZE); // 메모리의 [페이지 크기] 정보 검색
     length = 1 * pagesize;
 
     // 파일 생성

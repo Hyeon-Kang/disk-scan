@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int main(int arg, char * argv[]) {
+int main(int argc, char * argv[]) {
     int fd;
     caddr_t addr;
     struct stat statbuf;

@@ -25,7 +25,7 @@ int main(int argc, char * argv[]) {
         exit(1);
     }
     // 파일 내용을 메모리에 매핑
-    addr = mmap(NULL, statbuf.st_size, PROT_READ|PORT_WRITE, MAP_SHARED, fd, (off_t)0);
+    addr = mmap(NULL, statbuf.st_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, (off_t)0);
 
     if (addr == MAP_FAILED) {
         perror("mmap");
