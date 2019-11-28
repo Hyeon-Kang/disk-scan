@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
     int fd;
     pid_t pid;
     caddr_t addr;
+    char *temp;
     struct stat statbuf;
 
     // 입력 인자 개수 불 일치
@@ -53,7 +54,7 @@ int main(int argc, char *argv[]) {
         srand(time(NULL)); // 자식과 달리 부모는 가변적 랜덤시드 생성
 
         // 100번 반복
-        for(int j=0; j<100; j++){
+        for(int j=0; j<10; j++){
             random_p = rand()%100; // 0~99 범위에서 임의의 값 선택(배열 탐색용)
             printf("부모 %d 접근\n", random_p);
             if(addr[random_p] != 'p'){ // 접근 한 값이 p 가 아니라면
@@ -63,8 +64,15 @@ int main(int argc, char *argv[]) {
             }
             sleep(1);
         } // end for
+
+        printf("게임 결과 : %s\n", addr);
+        strcpy(temp, addr);
+        FILE *fpp = fopen(argv[1], "w+");    // 파일을 읽기/쓰기 모드로 열기.
+        fwrite(temp, strlen(temp), 1, fpp);
+        fclose(fpp);
+
     } else if(pid == 0) { // 자식 프로세스
-        for(int i=0; i<100; i++) {
+        for(int i=0; i<10; i++) {
             random_c = rand()%100;
             printf("자식 %d 접근\n", random_c);
             if(addr[random_c] != 'c') {
@@ -78,11 +86,6 @@ int main(int argc, char *argv[]) {
     }// end child
     //msync(addr, statbuf.st_size, MS_SYNC);
 
-    printf("게임 결과 : %s\n", addr);
-
-    FILE *fpp = fopen(argv[1], "w");    // 파일을 읽기/쓰기 모드로 열기.
-    fwrite(addr, strlen(addr), 1, fpp);
-    fclose(fpp);
 
     //munmap(addr, statbuf.st_size); // 메모리 매핑 해제
     return 0;
