@@ -123,11 +123,6 @@
 ## Setup
 윈도우 환경에서 사용을 가정하고 작성하였으므로 컴파일을 하기 위해선 윈도우용 gcc 컴파일러 'MinGw' 설치가 필요합니다.
 
-https://osdn.net/projects/mingw/downloads/68260/mingw-get-setup.exe # 설치 링크
+https://osdn.net/projects/mingw/downloads/68260/mingw-get-setup.exe # MinGw 컴파일러 설치 tool 링크
 
 환경변수 설정 및 설치 안내는 구글링!
-```
-$ cd ../lorem
-$ npm install
-$ npm start
-```
