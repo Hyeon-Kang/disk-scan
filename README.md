@@ -64,7 +64,7 @@
   
   
   
-  불필요한 문자가 보이지 않도록 수정한 뒤 다시 데이터를 생성합니다.
+  불필요한 문자가 보이지 않도록 수정한 뒤 다시 데이터를 생성합니다. 아무것도 없는 것 같지만 공백문자로 가득 찬 데이터 더미입니다.
   ![문자열처리](https://user-images.githubusercontent.com/44962939/69962767-0eeaec80-1552-11ea-9a80-f73cf450328a.PNG)
   
   
@@ -86,14 +86,24 @@
   
   
   
-  
+  역시 불필요한 문자열이 보이지 않도록 수정한 후 다시 스캔합니다.
+  문자열로 출력하니 헤더로 추정되는 부분은 깨져있고 'hello world!!' 문자열이 출력됩니다.
+  ![hello 발견](https://user-images.githubusercontent.com/44962939/69963827-612d0d00-1554-11ea-8797-ceda5c95968e.PNG)
+
 
   
   
-  
-  
-  
+  최종 목표 검증을 위해 hello.txt를 외부저장매체에서 제거합니다.
+  ![hello삭제1](https://user-images.githubusercontent.com/44962939/69963966-b8cb7880-1554-11ea-85b0-efdfe29a341c.PNG)
+  ![hello삭제2](https://user-images.githubusercontent.com/44962939/69963999-c97bee80-1554-11ea-93c4-fe02e2f85afa.PNG)
 
+
+  
+  
+  삭제를 확인했습니다. 디스크 스캔을 진행해봅시다.
+  
+  
+  
 
 ## 프로젝트 결과
 Project is created with:
