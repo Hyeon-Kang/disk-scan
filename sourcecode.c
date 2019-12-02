@@ -6,42 +6,34 @@
 
 #define _CRT_SECURE_NO_WARNINGS    // fopen 보안 경고로 인한 컴파일 에러 방지
 #define MAX_LINE 512
-/* 구현 방법
-1. 디스크 루트로 이동하여 파일리스트 보여주기
-2. 지정 파일 삭제 {
-파일 이름, 사이즈를 외부에 임시저장 *** 파일의 오프셋 위치를 미리 알 수 없을까?? 혼자면 몰라도 여러 파일이면 좀....
-** 파일 사이즈 얻기 GetFileSize https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfilesize
-파일 삭제
-}
-링크 : 파일의 사이즈 구하기 https://m.blog.naver.com/PostView.nhn?blogId=iloveembla&logNo=220963358032&proxyReferer=https%3A%2F%2Fwww.google.com%2F
-2. */
 
-// 실행 형식 : ./disk_scan (인식 드라이브 경로문자) (긁어온 데이터 저장 경로)
+void device_scan(char * drive_name);
 
-const char *byte_to_binary(int x);
-
-void device_scan(char drive_name, char * save_path);
-
-int main(int argc, char * argv[]) {
+int main(void) {
     time_t start, end; // 실행시간 측정
     double result;   // 실행시간 측정
     int i, j;    // 실행시간 측정
     int sum = 0; // 실행시간 측정
+    char  c1[2];
 
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+    printf("disk_scanner Ver0.2\n\n\n");
+    printf("please check your disk space before running this program\n\n");
+    printf("Enter the drive symbol.\n");
+    printf(" ex) if your drive disk symbol is E:, please enter enter E.\n\n");
+    printf("Drive Symbol : ");
+    scanf("%s", &c1);
     char make_path[20] = "\\\\.\\";
-    strcat(make_path, argv[1]);
+    strcat(make_path, c1);
     strcat(make_path, ":");
 
 
     // test make_path
     printf("test make_path : %s\n", make_path);
 
-    // 나중엔 argv[2]에 저장경로 받아다 사용할 것
-    char * save_path = "D:\00 Git desktop\disk-scan";
-
     start = time(NULL); // 시간 측정 시작
 
-    device_scan(make_path, save_path);
+    device_scan(make_path);
 
     end = time(NULL); // 시간 측정 끝
     result = (double)(end - start);
@@ -49,7 +41,7 @@ int main(int argc, char * argv[]) {
     return 0;
 }
 
-void device_scan(char drive_name, char * save_path) {
+void device_scan(char * drive_name) {
     int retCode = 0;
     BYTE sector[MAX_LINE]; // disk 내용을 읽어올 버퍼 (전통적으로 HDD는 섹터당 512바이트)
     DWORD bytesRead;  // 파일 포인터의 이동 시작 위치를 지정.
@@ -58,9 +50,8 @@ void device_scan(char drive_name, char * save_path) {
     int numSector_high = 5; //up point test
     BOOL brrtv;
 
-    int iter_cnt =0;
 
-    device = CreateFile("\\\\.\\E:",            // HANDLE 변수에 드라이브 구조체 지정 (경로, 접근 모드, )
+    device = CreateFile(drive_name,            // HANDLE 변수에 드라이브 구조체 지정 (경로, 접근 모드, )
     GENERIC_READ,           // 접근 모드 : 읽기
     FILE_SHARE_READ,        //|FILE_SHARE_WRITE,(쓰기 옵션은 제거)  // Share Mode
     NULL,                   // Security Descriptor (default NULL로 설정함)
@@ -80,9 +71,10 @@ void device_scan(char drive_name, char * save_path) {
     //FILE *fp = fopen("result.txt", "wb");    // hello.txt 파일을 쓰기 모드(w)로 열기.
 
     FILE *pFile = NULL;
-    pFile = fopen( "result.txt", "w+t" );
+    pFile = fopen( "./result.txt", "w+t" );
 
-    for (long j = 0; j<8388608; j++)
+    //for (long j = 0; j<8388608; j++)
+    while(1)
     {
         int temp = 0;
         memset((void *)sector, 0x00, 0xFF);
@@ -93,45 +85,14 @@ void device_scan(char drive_name, char * save_path) {
             break; // 반복문 탈출 (모두 읽어옴)
         }
         //fwrite(&sector , sizeof(sector) , 1 , pFile);
-        if(fprintf(temp, "%d", sector) != 0) {
-            printf("%d\n", temp);
-        }
         fprintf(pFile, "%s", sector);
 
         //fwrite(temp , sizeof(temp) , 1 , pFile);
         //fputs(temp, pFile);
 
-
-
-        //printf("%x", sector);
-        iter_cnt++;
-
-        if(iter_cnt%10000 == 0) {
-            printf("%d  * 10^4 \n", iter_cnt);
-            printf("%x\n", temp);
-            //printf("%s\n", byte_to_binary(temp));
-        }
     }
     //fclose(fp);
     fclose( pFile );
-    printf("종료!");
+    printf("스캔 완료!");
 
 } // end main
-
-
-const char *byte_to_binary(int x)
-{
-    static char b[9];
-    b[0] = '\0';
-
-    int z;
-    for (z = 128; z > 0; z >>= 1)
-    {
-        strcat(b, ((x & z) == z) ? "1" : "0");
-    }
-
-    return b;
-}
-// 지정 경로에 읽어온 데이터를 쓰는 과정 추가, 인식 드라이브 문자 입력
-// write file 참조 링크
-//https://hh-nn.tistory.com/43
