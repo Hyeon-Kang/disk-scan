@@ -2,7 +2,8 @@
 
 ## 목차
 * [프로젝트 구성원](#프로젝트-구성원)
-* [프로젝트 소개](#프로젝트-소개) // 개발 아키텍쳐 추가
+* [프로젝트 소개](#프로젝트-소개)
+* [개발 아키텍쳐](#개발-아키텍쳐)
 * [프로젝트 결과](#프로젝트-결과) // 다이어그램 추가
 * [사용법](#사용법)
 * [활용 방안](#활용-방안)
@@ -27,9 +28,9 @@
   
   
   
+ ## 프로젝트 결과
   
-  
- * 검증 방법  
+ * 프로그램   
  
  
   실험을 진행할 외부저장장치에 별도의 소거 프로그램을 이용하여 완전포맷을 진행합니다.
@@ -101,15 +102,16 @@
   
   
   삭제를 확인했습니다. 디스크 스캔을 진행해봅시다.
+  ![삭제 후 hello 발견](https://user-images.githubusercontent.com/44962939/69964293-70f92100-1555-11ea-9a43-55d14f52a74f.PNG)
+
+  hello world 문자열이 그대로 남아있는 것을 볼 수 있습니다.
   
   
+  실증을 위해 코드를 따로 첨부하도록 하겠습니다.
   
 
-## 프로젝트 결과
-Project is created with:
-* Lorem version: 12.3
-* Ipsum version: 2.33
-* Ament library version: 999
+
+
 
 
 ## 사용법
@@ -119,8 +121,11 @@ Project is created with:
 
 
 ## Setup
-To run this project, install it locally using npm:
+윈도우 환경에서 사용을 가정하고 작성하였으므로 컴파일을 하기 위해선 윈도우용 gcc 컴파일러 'MinGw' 설치가 필요합니다.
 
+https://osdn.net/projects/mingw/downloads/68260/mingw-get-setup.exe # 설치 링크
+
+환경변수 설정 및 설치 안내는 구글링!
 ```
 $ cd ../lorem
 $ npm install
