@@ -2,7 +2,10 @@
 #include <winbase.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h> // 실행시간 측정
 
+#define _CRT_SECURE_NO_WARNINGS    // fopen 보안 경고로 인한 컴파일 에러 방지
+#define MAX_LINE 512
 /* 구현 방법
 1. 디스크 루트로 이동하여 파일리스트 보여주기
 2. 지정 파일 삭제 {
@@ -15,12 +18,19 @@
 
 // 실행 형식 : ./disk_scan (인식 드라이브 경로문자) (긁어온 데이터 저장 경로)
 
+
 void device_scan(char drive_name, char * save_path);
 
 int main(int argc, char * argv[]) {
+    time_t start, end; // 실행시간 측정
+    double result;   // 실행시간 측정
+    int i, j;    // 실행시간 측정
+    int sum = 0; // 실행시간 측정
+
     char make_path[20] = "\\\\.\\";
     strcat(make_path, argv[1]);
     strcat(make_path, ":");
+
 
     // test make_path
     printf("test make_path : %s\n", make_path);
@@ -28,8 +38,13 @@ int main(int argc, char * argv[]) {
     // 나중엔 argv[2]에 저장경로 받아다 사용할 것
     char * save_path = "D:\00 Git desktop\disk-scan";
 
+    start = time(NULL); // 시간 측정 시작
+
     device_scan(make_path, save_path);
-    // 파일 저장
+
+    end = time(NULL); // 시간 측정 끝
+    result = (double)(end - start);
+    printf("%f", result); //결과 출력
     return 0;
 }
 
@@ -40,6 +55,9 @@ void device_scan(char drive_name, char * save_path) {
     HANDLE device = NULL; // 파일포인터를 옮기고자 하는 대상 파일의 핸들. 목표 저장장치 주소를 담을 변수로 사용.
     int numSector = 5;
     int numSector_high = 5; //up point test
+    BOOL brrtv;
+
+    int iter_cnt =0;
 
     device = CreateFile("\\\\.\\E:",            // HANDLE 변수에 드라이브 구조체 지정 (경로, 접근 모드, )
     GENERIC_READ,           // 접근 모드 : 읽기
@@ -58,25 +76,34 @@ void device_scan(char drive_name, char * save_path) {
 
     DWORD dwPos = SetFilePointer (device, numSector*512, NULL, FILE_BEGIN) ; // 32bit clearc
 
-    // 주소 읽어오기
-    if (!ReadFile(device, sector, 512, &bytesRead, NULL)) {
-        //(장치 핸들러, 읽어올 버퍼, sizeof(버퍼), 읽어온 바이트 수를 반환하기 위한 출력용 인수, 4gb 이하면 null)
-        printf("ReadFile: %u\n", GetLastError());
-    } else {
-        // 디스크 사이즈 알아낸 다음 나눠서 계속 파일 쓰게 시킴
-        // 검증용
-        // 16 진수로 바이트 단위로 읽어오기, 점검을 위해 10^9승이 아닌 10^3승까지만 불러옴
-        int cnt =0;
-        int buf =0;
+    FILE *fp = fopen("result.txt", "wb");    // hello.txt 파일을 쓰기 모드(w)로 열기.
 
-        // 저장장치 용량을 가져와 반복횟수 구현하기
-        for(int i=0; i<1000; i++) {
-            printf("%x",sector);
+    while(1)
+    {
+
+
+                                       // 파일 포인터를 반환
+        memset((void *)sector, 0x00, MAX_LINE);
+        brrtv = ReadFile(device, sector, MAX_LINE-1, &bytesRead, NULL);
+        //if(brrtv && bytesRead == 0) // ReadFile 함수가 끝에 도달하면 0 반환 brrtv == 0으로도 해보기
+        if(brrtv == 0)
+        {
+
+            break; // 반복문 탈출 (모두 읽어옴)
         }
-        printf("\nSuccess!\n");
-        //fclose(fp);
+        fwrite(&sector , sizeof(sector) , 1 , fp);
+
+        //printf("%x", sector);
+        iter_cnt++;
+
+        if(iter_cnt%10000 == 0) {
+            printf("%d  * 10^4 \n", iter_cnt);
+        }
     }
-}
+    fclose(fp);
+    printf("종료!");
+
+} // end main
 
 // 지정 경로에 읽어온 데이터를 쓰는 과정 추가, 인식 드라이브 문자 입력
 // write file 참조 링크
