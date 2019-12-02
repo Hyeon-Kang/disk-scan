@@ -86,9 +86,8 @@ void device_scan(char drive_name, char * save_path) {
         memset((void *)sector, 0x00, MAX_LINE);
         brrtv = ReadFile(device, sector, MAX_LINE-1, &bytesRead, NULL);
         //if(brrtv && bytesRead == 0) // ReadFile 함수가 끝에 도달하면 0 반환 brrtv == 0으로도 해보기
-        if(brrtv == 0)
+        if(brrtv && bytesRead == 0)
         {
-
             break; // 반복문 탈출 (모두 읽어옴)
         }
         fwrite(&sector , sizeof(sector) , 1 , fp);
