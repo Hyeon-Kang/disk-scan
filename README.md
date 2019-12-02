@@ -32,6 +32,12 @@
  ![시스템 플로우차트](https://user-images.githubusercontent.com/44962939/69970635-e79c1b80-1561-11ea-92f6-1fc7b8cb83c1.PNG)
 
  
+ 
+## 개발환경 아키텍쳐
+![개발환경_아키텍쳐](https://user-images.githubusercontent.com/44962939/69970614-dd7a1d00-1561-11ea-9beb-eef3315bb515.PNG)
+
+
+ 
   
  ## 프로젝트 결과
   
@@ -114,10 +120,6 @@
   
   실증을 위해 코드를 따로 첨부하도록 하겠습니다.
   
-
-## 개발환경 아키텍쳐
-![개발환경_아키텍쳐](https://user-images.githubusercontent.com/44962939/69970614-dd7a1d00-1561-11ea-9beb-eef3315bb515.PNG)
-
 
 
 
