@@ -5,7 +5,7 @@
 #include <time.h> // 실행시간 측정
 
 #define _CRT_SECURE_NO_WARNINGS    // fopen 보안 경고로 인한 컴파일 에러 방지
-#define MAX_LINE 512
+#define MAX_LINE 1024
 /* 구현 방법
 1. 디스크 루트로 이동하여 파일리스트 보여주기
 2. 지정 파일 삭제 {
@@ -18,6 +18,7 @@
 
 // 실행 형식 : ./disk_scan (인식 드라이브 경로문자) (긁어온 데이터 저장 경로)
 
+const char *byte_to_binary(int x);
 
 void device_scan(char drive_name, char * save_path);
 
@@ -50,7 +51,7 @@ int main(int argc, char * argv[]) {
 
 void device_scan(char drive_name, char * save_path) {
     int retCode = 0;
-    BYTE sector[512]; // disk 내용을 읽어올 버퍼 (전통적으로 HDD는 섹터당 512바이트)
+    BYTE sector[MAX_LINE]; // disk 내용을 읽어올 버퍼 (전통적으로 HDD는 섹터당 512바이트)
     DWORD bytesRead;  // 파일 포인터의 이동 시작 위치를 지정.
     HANDLE device = NULL; // 파일포인터를 옮기고자 하는 대상 파일의 핸들. 목표 저장장치 주소를 담을 변수로 사용.
     int numSector = 5;
@@ -74,36 +75,59 @@ void device_scan(char drive_name, char * save_path) {
         exit(1);
     }
 
-    DWORD dwPos = SetFilePointer (device, numSector*512, NULL, FILE_BEGIN) ; // 32bit clearc
+    DWORD dwPos = SetFilePointer (device, numSector*MAX_LINE, NULL, FILE_BEGIN) ; // 32bit clearc
 
-    FILE *fp = fopen("result.txt", "wb");    // hello.txt 파일을 쓰기 모드(w)로 열기.
+    //FILE *fp = fopen("result.txt", "wb");    // hello.txt 파일을 쓰기 모드(w)로 열기.
 
-    while(1)
+    FILE *pFile = NULL;
+    pFile = fopen( "result.txt", "w+t" );
+
+    for (long j = 0; j<8388608; j++)
     {
-
-
-                                       // 파일 포인터를 반환
-        memset((void *)sector, 0x00, MAX_LINE);
-        brrtv = ReadFile(device, sector, MAX_LINE-1, &bytesRead, NULL);
+        char temp = NULL;
+        memset((void *)sector, 0x00, 0xFF);
+        brrtv = ReadFile(device, sector, MAX_LINE , &bytesRead, NULL);
         //if(brrtv && bytesRead == 0) // ReadFile 함수가 끝에 도달하면 0 반환 brrtv == 0으로도 해보기
-        if(brrtv && bytesRead == 0)
+        if(brrtv && bytesRead  == 0)
         {
             break; // 반복문 탈출 (모두 읽어옴)
         }
-        fwrite(&sector , sizeof(sector) , 1 , fp);
+        //fwrite(&sector , sizeof(sector) , 1 , pFile);
+        fprintf(temp, "%x", sector);
+        fwrite(temp , sizeof(temp) , 1 , pFile);
+
+
+
 
         //printf("%x", sector);
         iter_cnt++;
 
         if(iter_cnt%10000 == 0) {
             printf("%d  * 10^4 \n", iter_cnt);
+            printf("%x\n", temp);
+            //printf("%s\n", byte_to_binary(temp));
         }
     }
-    fclose(fp);
+    //fclose(fp);
+    fclose( pFile );
     printf("종료!");
 
 } // end main
 
+
+const char *byte_to_binary(int x)
+{
+    static char b[9];
+    b[0] = '\0';
+
+    int z;
+    for (z = 128; z > 0; z >>= 1)
+    {
+        strcat(b, ((x & z) == z) ? "1" : "0");
+    }
+
+    return b;
+}
 // 지정 경로에 읽어온 데이터를 쓰는 과정 추가, 인식 드라이브 문자 입력
 // write file 참조 링크
 //https://hh-nn.tistory.com/43
