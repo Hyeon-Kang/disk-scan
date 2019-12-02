@@ -28,8 +28,11 @@
  * 검증 방법
  
   실험을 진행할 외부저장장치에 별도의 소거 프로그램을 이용하여 완전포맷을 진행합니다.
+  ![완전포맷](https://user-images.githubusercontent.com/44962939/69961262-dbf32980-154e-11ea-8d9d-92666888938b.PNG)
+ 
   포맷이 끝난 뒤 디스크 공간을 스캔하여 별도의 값이 있는지 검사합니다.
-  
+  ![반복중](https://user-images.githubusercontent.com/44962939/69961318-f75e3480-154e-11ea-8a7b-a387d1e6ba88.PNG)
+
   
   
   
