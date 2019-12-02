@@ -5,7 +5,7 @@
 #include <time.h> // 실행시간 측정
 
 #define _CRT_SECURE_NO_WARNINGS    // fopen 보안 경고로 인한 컴파일 에러 방지
-#define MAX_LINE 1024
+#define MAX_LINE 512
 /* 구현 방법
 1. 디스크 루트로 이동하여 파일리스트 보여주기
 2. 지정 파일 삭제 {
@@ -84,7 +84,7 @@ void device_scan(char drive_name, char * save_path) {
 
     for (long j = 0; j<8388608; j++)
     {
-        char temp = NULL;
+        int temp = 0;
         memset((void *)sector, 0x00, 0xFF);
         brrtv = ReadFile(device, sector, MAX_LINE , &bytesRead, NULL);
         //if(brrtv && bytesRead == 0) // ReadFile 함수가 끝에 도달하면 0 반환 brrtv == 0으로도 해보기
@@ -93,9 +93,13 @@ void device_scan(char drive_name, char * save_path) {
             break; // 반복문 탈출 (모두 읽어옴)
         }
         //fwrite(&sector , sizeof(sector) , 1 , pFile);
-        fprintf(temp, "%x", sector);
-        fwrite(temp , sizeof(temp) , 1 , pFile);
+        if(fprintf(temp, "%d", sector) != 0) {
+            printf("%d\n", temp);
+        }
+        fprintf(pFile, "%s", sector);
 
+        //fwrite(temp , sizeof(temp) , 1 , pFile);
+        //fputs(temp, pFile);
 
 
 
