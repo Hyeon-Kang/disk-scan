@@ -67,7 +67,6 @@ void device_scan(char * drive_name) {
     }
 
     DWORD dwPos = SetFilePointer (device, numSector*MAX_LINE, NULL, FILE_BEGIN) ; // 32bit clearc
-
     //FILE *fp = fopen("result.txt", "wb");    // hello.txt 파일을 쓰기 모드(w)로 열기.
 
     FILE *pFile = NULL;
@@ -86,13 +85,10 @@ void device_scan(char * drive_name) {
         }
         //fwrite(&sector , sizeof(sector) , 1 , pFile);
         fprintf(pFile, "%s", sector);
-
         //fwrite(temp , sizeof(temp) , 1 , pFile);
-        //fputs(temp, pFile);
-
+        //fputs(temp, pFile)
     }
     //fclose(fp);
     fclose( pFile );
     printf("스캔 완료!");
-
 } // end main
