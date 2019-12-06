@@ -7,29 +7,29 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <siginfo.h>
+//#include <siginfo.h>
 #include <signal.h>
 #include <unistd.h>
 
 void handler(int signo) {
-    printf("SIGQUIT handler is called!");
-    psignal(signo, "Recived Signal");
+    printf("SIGQUIT handler is called!\n");
+    //printf("Signal Handler Signal Number : %d\n", signo);
+    psignal(signo, "Recived Signal\n");
 }
 
 int main(void) {
     void(*hand)(int);
 
-    hand = signal(SIGINT, handler); // 시그널 핸들러 지정
+    hand = signal(SIGQUIT, handler); // 시그널 핸들러 지정
     if (hand == SIG_ERR) {
         perror("signal");
         exit(1);
     }
 
-    printf("Wait 1st Ctrl+D... : SIGQUIT\n");
+    printf("Wait Ctrl + \\ : SIGQUIT\n");
+    //printf("Wait 1st Ctrl+D... : SIGQUIT\n");
     pause(); // 시그널 입력 대기
-
+    printf("Wait Ctrl + \\ : SIGQUIT\n");
+    pause();
     return 0;
 }
-
-
-ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEArvjKXkjFBBfQkLWnrPvNhIiymi7cpOAzyLuND5RQaERdK+neUUUroHz+P0CN1iFGZGt/IP4E20s/nEXmTg6tkqgX4jAM5FZ4VMxMshmKXvrHypraC2Sxf60gAdbaGGzTjsyvESPUjmza2ydH7s72gX8c07YAT1NT4QXz2uu5TWn4+ePywoguGlAkbm1PbWZT7c1W4ojnOUts1O+M86epry1svqPyVnsCjdV4Ve0JfRDr1lgkQO6mENtNAmA9OP6rAmeDC+FjCYjMPRrzei5OzIPTR6rPauac3agYkP8o68hctlQ5r6D7s8xKlv2US2bOQe4uNqeFHzw8eNq0oELnIQ== google-ssh {"userName":"addwin0107","expireOn":"2019-12-03T10:48:35+0000"}
